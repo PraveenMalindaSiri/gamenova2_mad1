@@ -1,8 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
-import 'package:mad_1_gamenova_1/views/pages/main_nav.dart';
-import 'package:mad_1_gamenova_1/views/pages/register.dart';
+import 'package:gamenova2_mad1/core/service/user_service.dart';
+import 'package:gamenova2_mad1/views/pages/auth/register.dart';
 import 'package:social_media_buttons/social_media_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,11 +13,29 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final UsernameCnt = TextEditingController();
+  final EmailCnt = TextEditingController();
   final PassCnt = TextEditingController();
   final formkey = GlobalKey<FormState>();
 
+  bool _isLoading = false;
   String? error;
+
+  Future<void> _login() async {
+    if (!formkey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final user = UserService.login;
+      await user(EmailCnt.text, PassCnt.text);
+      if (!mounted) return;
+    } catch (e) {
+      if (!mounted) return;
+      //
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   Widget _buildHeader(double width) {
     return Padding(
@@ -62,22 +80,19 @@ class _LoginScreenState extends State<LoginScreen> {
       key: formkey,
       child: Column(
         children: [
-          // username
+          // email
           SizedBox(
             width: 400,
             child: TextFormField(
-              controller: UsernameCnt,
+              controller: EmailCnt,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return ("Please fill the username corectly.");
+                  return ("Please fill the email corectly.");
                 }
-                // if (value.length < 6) {
-                //   return ("Username should have at least 6 letters");
-                // }
                 return null;
               },
               decoration: InputDecoration(
-                labelText: 'Username',
+                labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -93,9 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (value == null || value.isEmpty) {
                   return ("Please fill the password corectly.");
                 }
-                // if (value.length < 8) {
-                //   return ("Password should have at least 8 letters");
-                // }
                 return null;
               },
               obscureText: true,
@@ -114,25 +126,19 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           Padding(padding: EdgeInsets.only(bottom: 10)),
           ElevatedButton(
-            onPressed: () {
-              if (formkey.currentState!.validate()) {
-                if (UsernameCnt.text == "123" && PassCnt.text == "123") {
-                  setState(() {
-                    error = null;
-                  });
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MainNavScreen(selectPageIndex: 0),
-                    ),
-                  );
-                } else {
-                  setState(() {
-                    error = "Invalid Username or Password. Please Try Again!";
-                  });
-                }
-              }
-            },
+            onPressed: _isLoading
+                ? null
+                : () async {
+                    if (!formkey.currentState!.validate()) return;
+                    setState(() => _isLoading = true);
+
+                    try {
+                      await _login();
+                      if (!mounted) return;
+                    } finally {
+                      if (mounted) setState(() => _isLoading = false);
+                    }
+                  },
             child: Text(
               'LOG IN',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),

@@ -1,12 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:mad_1_gamenova_1/core/colors.dart';
-import 'package:mad_1_gamenova_1/core/game.dart';
-import 'package:mad_1_gamenova_1/core/games_lists.dart';
-import 'package:mad_1_gamenova_1/views/pages/main_nav.dart';
-import 'package:mad_1_gamenova_1/views/pages/product_view.dart';
-import 'package:mad_1_gamenova_1/views/widgets/card.dart';
+import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/utility/colors.dart';
+import 'package:gamenova2_mad1/views/pages/main_nav.dart';
+import 'package:gamenova2_mad1/views/pages/product_view.dart';
+import 'package:gamenova2_mad1/views/widgets/card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -121,8 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
               "assets/images/main/main_img.png",
               fit: BoxFit.fill,
               width: MediaQuery.of(context).size.width * 0.3,
-              color:  !isDark ? AppColors.darkGray : Colors.white,
-              
+              color: !isDark ? AppColors.darkGray : Colors.white,
             ),
           ),
         ),
@@ -130,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEditionSection(String edition, List<Game> games) {
+  Widget _buildEditionSection(String edition, List<Product> games) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
@@ -164,8 +162,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (context) => MainNavScreen(selectPageIndex: 1),
+                          builder: (context) =>
+                              MainNavScreen(selectPageIndex: 1),
                         ),
                       );
                     },
@@ -193,9 +191,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  ProductViewScreen(game: games[index]),
+                          builder: (context) =>
+                              ProductViewScreen(game: games[index]),
                         ),
                       );
                     },
@@ -216,21 +213,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             if (constraints.maxWidth < 700) {
-              return Column(
-                children: [
-                  _buildIntro(),
-                  _buildEditionSection('Physical Editions', pGames),
-                  _buildEditionSection("Digital Editions", dGames),
-                ],
-              );
+              return Column(children: [_buildIntro()]);
             } else {
-              return Column(
-                children: [
-                  _buildIntroLand(),
-                  _buildEditionSection('Physical Editions', pGames),
-                  _buildEditionSection("Digital Editions", dGames),
-                ],
-              );
+              return Column(children: [_buildIntroLand()]);
             }
           },
         ),
