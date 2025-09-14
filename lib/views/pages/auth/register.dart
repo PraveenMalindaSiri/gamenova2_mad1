@@ -31,18 +31,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _register() async {
     if (!formkey.currentState!.validate()) return;
     setState(() => _isLoading = true);
+    final role = (SelcRole ?? 'Customer').toLowerCase();
+
+    if (role == 'customer' && AgeCnt.text.trim().isEmpty) {
+      return;
+    }
 
     try {
-      final role = (SelcRole ?? 'Customer').toLowerCase();
-
       final data = {
         "name": NameCnt.text.trim(),
         "email": EmailCnt.text.trim(),
         "role": role,
         "password": PassCnt.text.trim(),
         "password_confirmation": ConfPassCnt.text.trim(),
-        if (AgeCnt.text.trim().isNotEmpty) "dob": AgeCnt.text.trim(),
       };
+      final dobText = AgeCnt.text.trim();
+      if (dobText.isNotEmpty) {
+        data["dob"] = dobText;
+      }
 
       final user = await UserService.register(data: data);
       if (!mounted) return;
@@ -88,7 +94,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         items: roles
             .map((role) => DropdownMenuItem(value: role, child: Text(role)))
             .toList(),
-        onChanged: (value) => setState(() => SelcRole = value),
+        onChanged: (value) {
+          setState(() {
+            SelcRole = value;
+            if ((value ?? '').toLowerCase() == 'seller') {
+              AgeCnt.clear();
+            }
+          });
+        },
         validator: (value) => value == null ? "Please select a Role" : null,
         decoration: InputDecoration(
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -166,13 +179,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     buildRole(
                       context,
-                      MediaQuery.of(context).size.width * 0.35,
+                      MediaQuery.of(context).size.width * 0.34,
                     ),
                     SizedBox(width: 20),
                     if (isCustomer)
                       buildAge(
                         context,
-                        MediaQuery.of(context).size.width * 0.35,
+                        MediaQuery.of(context).size.width * 0.34,
                       ),
                   ],
                 );
@@ -195,24 +208,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Padding(padding: EdgeInsets.only(bottom: 10)),
 
           // button
-          ElevatedButton(
-            onPressed: _isLoading
-                ? null
-                : () {
-                    if (formkey.currentState!.validate()) {
-                      _register();
-                    }
-                  },
-            child: _isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text(
-                    'REGISTER',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                  ),
+          SizedBox(
+            width: MediaQuery.sizeOf(context).width * 0.5,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading
+                  ? null
+                  : () async {
+                      if (!formkey.currentState!.validate()) return;
+                      setState(() => _isLoading = true);
+                      try {
+                        await _register();
+                        if (!mounted) return;
+                      } finally {
+                        if (mounted) setState(() => _isLoading = false);
+                      }
+                    },
+              icon: _isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.login),
+              label: const Text(
+                'REGISTER',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                minimumSize: const Size.fromHeight(48),
+              ),
+            ),
           ),
           SizedBox(height: 20),
 

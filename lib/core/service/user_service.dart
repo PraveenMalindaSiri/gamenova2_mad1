@@ -5,8 +5,11 @@ import 'package:gamenova2_mad1/core/models/user.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  static const String loginPath = "/api/login";
-  static const String registerPath = "/api/register";
+  // static const String loginPath = "https://gamenova.duckdns.org/api/login";
+  // static const String registerPath =
+  //     "https://gamenova.duckdns.org/api/register";
+  static const String loginPath = "http://127.0.0.1:8000/api/login";
+  static const String registerPath = "http://127.0.0.1:8000/api/register";
 
   static Future<User> login(String email, String password) async {
     try {

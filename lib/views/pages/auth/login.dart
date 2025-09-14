@@ -26,8 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final user = UserService.login;
-      await user(EmailCnt.text, PassCnt.text);
+      final user = await UserService.login(EmailCnt.text, PassCnt.text);
+      print(user.token);
       if (!mounted) return;
     } catch (e) {
       if (!mounted) return;
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
+          Padding(padding: EdgeInsets.only(bottom: 30)),
 
           // password
           SizedBox(
@@ -117,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+
           Padding(padding: EdgeInsets.only(bottom: 10)),
           if (error != null)
             Text(
@@ -124,26 +125,41 @@ class _LoginScreenState extends State<LoginScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.red),
             ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
-          ElevatedButton(
-            onPressed: _isLoading
-                ? null
-                : () async {
-                    if (!formkey.currentState!.validate()) return;
-                    setState(() => _isLoading = true);
 
-                    try {
-                      await _login();
-                      if (!mounted) return;
-                    } finally {
-                      if (mounted) setState(() => _isLoading = false);
-                    }
-                  },
-            child: Text(
-              'LOG IN',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          Padding(padding: EdgeInsets.only(bottom: 10)),
+          SizedBox(
+            width: 300,
+            child: ElevatedButton.icon(
+              onPressed: _isLoading
+                  ? null
+                  : () async {
+                      if (!formkey.currentState!.validate()) return;
+                      setState(() => _isLoading = true);
+                      try {
+                        await _login();
+                        if (!mounted) return;
+                      } finally {
+                        if (mounted) setState(() => _isLoading = false);
+                      }
+                    },
+              icon: _isLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.login),
+              label: const Text(
+                'LOG IN',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                minimumSize: const Size.fromHeight(48),
+              ),
             ),
           ),
+
           Padding(padding: EdgeInsets.only(bottom: 10)),
           TextButton(
             onPressed: () {
