@@ -5,6 +5,7 @@ import 'package:gamenova2_mad1/views/pages/customer/cart.dart';
 import 'package:gamenova2_mad1/views/pages/customer/wishlist.dart';
 import 'package:gamenova2_mad1/views/pages/home.dart';
 import 'package:gamenova2_mad1/views/pages/products.dart';
+import 'package:gamenova2_mad1/views/widgets/navbar.dart';
 
 class MainNavScreen extends StatefulWidget {
   final int selectPageIndex;
@@ -15,42 +16,32 @@ class MainNavScreen extends StatefulWidget {
 }
 
 class _MainNavScreenState extends State<MainNavScreen> {
-  void navigate(BuildContext context, int index) {
-    if (index != widget.selectPageIndex) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return MainNavScreen(selectPageIndex: index);
-          },
-        ),
-      );
+  late int _index;
+
+  @override
+  void initState() {
+    super.initState();
+    _index = widget.selectPageIndex;
+  }
+
+  @override
+  void didUpdateWidget(covariant MainNavScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectPageIndex != widget.selectPageIndex) {
+      _index = widget.selectPageIndex;
     }
   }
 
-  Widget getPage() {
-    if (widget.selectPageIndex == 1) {
-      return ProductsScreen();
-    }
-    if (widget.selectPageIndex == 2) {
-      return WishlistScreen();
-    }
-    if (widget.selectPageIndex == 3) {
-      return CartScreen();
-    } else {
-      return HomeScreen();
-    }
+  void _navigate(int i) {
+    if (_index == i) return;
+    setState(() => _index = i);
   }
 
-  Widget drawerItem(String text, int index) {
+  Widget _drawerItem(String text, int index) {
     return TextButton(
       onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MainNavScreen(selectPageIndex: index),
-          ),
-        );
+        _navigate(index);
+        Navigator.pop(context);
       },
       child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
     );
@@ -58,37 +49,49 @@ class _MainNavScreenState extends State<MainNavScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _pages = [
+      HomeScreen(onGoToTab: _navigate),
+      ProductsScreen(),
+      WishlistScreen(),
+      CartScreen(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 40,
-        title: Center(child: Text("GameNova", style: TextStyle(fontSize: 30))),
+        title: const Center(
+          child: Text("GameNova", style: TextStyle(fontSize: 30)),
+        ),
       ),
       drawer: Drawer(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 60),
+              const SizedBox(height: 60),
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: drawerItem("Home", 0),
+                child: _drawerItem("Home", 0),
               ),
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: drawerItem("Games", 1),
+                child: _drawerItem("Games", 1),
               ),
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: drawerItem("Wishlist", 2),
+                child: _drawerItem("Wishlist", 2),
               ),
               Padding(
                 padding: const EdgeInsets.all(10),
-                child: drawerItem("Cart", 3),
+                child: _drawerItem("Cart", 3),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                    (route) => false,
                   );
                 },
                 child: Row(
@@ -100,8 +103,8 @@ class _MainNavScreenState extends State<MainNavScreen> {
                         color: AppColors.darkSkyBlue,
                       ),
                     ),
-                    SizedBox(width: 5),
-                    Icon(Icons.logout, size: 22),
+                    const SizedBox(width: 5),
+                    const Icon(Icons.logout, size: 22),
                   ],
                 ),
               ),
@@ -109,33 +112,13 @@ class _MainNavScreenState extends State<MainNavScreen> {
           ),
         ),
       ),
-      body: getPage(),
+
+      // Keep tab states alive
+      body: IndexedStack(index: _index, children: _pages),
+
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: BottomNavigationBar(
-          currentIndex: widget.selectPageIndex,
-          onTap: (value) {
-            navigate(context, value);
-          },
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Colors.blueGrey,
-          elevation: 0, // remove shadow
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
-          unselectedLabelStyle: TextStyle(color: Colors.grey),
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.games), label: "Games"),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              label: "Wishlist",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_bag),
-              label: "Cart",
-            ),
-          ],
-        ),
+        child: MyNavigation(currentIndex: _index, onTap: _navigate),
       ),
     );
   }

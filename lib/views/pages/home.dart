@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
-import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
 import 'package:gamenova2_mad1/views/widgets/card.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final void Function(int)? onGoToTab;
+  const HomeScreen({super.key, this.onGoToTab});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -207,15 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MainNavScreen(selectPageIndex: 1),
-                        ),
-                      );
-                    },
+                    onPressed: () => widget.onGoToTab?.call(1),
                     child: Text(
                       "See more...",
                       style: TextStyle(
@@ -273,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildIntro(),
                         _buildSection('Latest Games', _latestGames),
                         _buildSection("Featured Games", _featuredGames),
-                        Padding(padding: EdgeInsetsGeometry.only(bottom: 10)),
+                        Padding(padding: EdgeInsets.only(bottom: 10)),
                       ],
                     );
                   } else {
@@ -282,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildIntroLand(),
                         _buildSection('Latest Games', _latestGames),
                         _buildSection("Featured Games", _featuredGames),
-                        Padding(padding: EdgeInsetsGeometry.only(bottom: 10)),
+                        Padding(padding: EdgeInsets.only(bottom: 10)),
                       ],
                     );
                   }

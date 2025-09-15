@@ -246,7 +246,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   _buildGenreSection('RPG Games', _rpgGames),
                   _buildGenreSection('Shooter Games', _shooterGames),
                   _buildGenreSection('Racing Games', _racingGames),
-                  Padding(padding: EdgeInsetsGeometry.only(bottom: 10)),
+                  Padding(padding: EdgeInsets.only(bottom: 10)),
                 ],
               ),
             ),

@@ -29,7 +29,7 @@ class GameCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.asset(
-                  game.imageUrl,
+                  "assets/images/main/login_img.png",
                   fit: BoxFit.fill,
                   width: 200,
                   height: 200,

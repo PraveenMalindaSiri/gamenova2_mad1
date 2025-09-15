@@ -72,7 +72,7 @@ class ProductService {
         final list = items
             .map((j) => Product.fromJson(j as Map<String, dynamic>))
             .toList();
-        print(list);
+        // print(list);
         return list;
       } else {
         throw Exception('Failed to load products: ${response.statusCode}');
