@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
 import 'package:gamenova2_mad1/views/widgets/card.dart';
+import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -65,9 +68,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
         _racingGames = racing;
         _isLoading = false;
       });
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
+
       if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Loading Games failed',
+        // message: e.toString(),
+        type: NoticeType.error,
+      );
     }
   }
 

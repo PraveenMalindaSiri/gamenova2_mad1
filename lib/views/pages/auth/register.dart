@@ -1,9 +1,12 @@
 // ignore_for_file: non_constant_identifier_names, unused_local_variable
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/user.dart';
 import 'package:gamenova2_mad1/core/service/user_service.dart';
 import 'package:gamenova2_mad1/views/pages/auth/login.dart';
+import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -34,6 +37,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final role = (SelcRole ?? 'Customer').toLowerCase();
 
     if (role == 'customer' && AgeCnt.text.trim().isEmpty) {
+      setState(() => _isLoading = false);
+      await showNoticeDialog(
+        context: context,
+        title: 'Date of Birth required',
+        message: 'Please select your date of birth to continue.',
+        type: NoticeType.warning,
+      );
       return;
     }
 
@@ -52,9 +62,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       final user = await UserService.register(data: data);
       if (!mounted) return;
+      if (user.token == null || user.token!.isEmpty) {
+        await showNoticeDialog(
+          context: context,
+          title: 'Registration failed',
+          message: 'Try Again',
+          type: NoticeType.error,
+        );
+        return;
+      }
+
+      await showNoticeDialog(
+        context: context,
+        title: 'Registered!',
+        message: 'Your account is ready. Please log in.',
+        type: NoticeType.success,
+      );
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
     } catch (e) {
       if (!mounted) return;
-      //
+      await showNoticeDialog(
+        context: context,
+        title: 'Registration failed',
+        message: "Something went wrong",
+        type: NoticeType.error,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -113,6 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildForm(context) {
+    final role = SelcRole;
     final isCustomer = (SelcRole ?? '').toLowerCase() == 'customer';
 
     return Form(
@@ -124,6 +164,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             width: MediaQuery.of(context).size.width * 0.7,
             child: Column(
               children: [
+                Text("Register as a $role"),
+                Padding(padding: EdgeInsets.only(bottom: 10)),
+
                 // fullname
                 MyTextField(
                   prefixIcon: Icons.title,
@@ -211,18 +254,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           SizedBox(
             width: MediaQuery.sizeOf(context).width * 0.5,
             child: ElevatedButton.icon(
-              onPressed: _isLoading
-                  ? null
-                  : () async {
-                      if (!formkey.currentState!.validate()) return;
-                      setState(() => _isLoading = true);
-                      try {
-                        await _register();
-                        if (!mounted) return;
-                      } finally {
-                        if (mounted) setState(() => _isLoading = false);
-                      }
-                    },
+              onPressed: _isLoading ? null : _register,
               icon: _isLoading
                   ? const SizedBox(
                       width: 22,
@@ -254,6 +286,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    NameCnt.dispose();
+    EmailCnt.dispose();
+    AgeCnt.dispose();
+    PassCnt.dispose();
+    ConfPassCnt.dispose();
+    super.dispose();
   }
 
   @override

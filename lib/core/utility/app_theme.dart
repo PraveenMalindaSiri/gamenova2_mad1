@@ -28,7 +28,12 @@ class AppTheme {
         bodySmall: TextStyle(fontSize: 14, color: Colors.black54),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        errorStyle: TextStyle(fontSize: 14),
+        labelStyle: TextStyle(fontSize: 16),
+        hintStyle: TextStyle(fontSize: 16),
+        floatingLabelStyle: TextStyle(fontSize: 14),
+        helperStyle: TextStyle(fontSize: 12),
+        errorStyle: TextStyle(fontSize: 12),
+        border: OutlineInputBorder(),
       ),
     );
   }
@@ -59,7 +64,12 @@ class AppTheme {
         bodySmall: TextStyle(fontSize: 14, color: Colors.white60),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        errorStyle: TextStyle(fontSize: 14),
+        labelStyle: TextStyle(fontSize: 16),
+        hintStyle: TextStyle(fontSize: 16),
+        floatingLabelStyle: TextStyle(fontSize: 14),
+        helperStyle: TextStyle(fontSize: 12),
+        errorStyle: TextStyle(fontSize: 12),
+        border: OutlineInputBorder(),
       ),
     );
   }

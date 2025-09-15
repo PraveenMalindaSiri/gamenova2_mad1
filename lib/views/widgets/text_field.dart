@@ -20,6 +20,7 @@ Widget MyTextField(
       onTap: onTap,
       keyboardType: keyboardType,
       validator: validator,
+      style: Theme.of(context).textTheme.bodyMedium,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: prefixIcon != null

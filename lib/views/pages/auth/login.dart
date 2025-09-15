@@ -1,9 +1,12 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/service/user_service.dart';
 import 'package:gamenova2_mad1/views/pages/auth/register.dart';
 import 'package:gamenova2_mad1/views/pages/main_nav.dart';
+import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:social_media_buttons/social_media_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,16 +33,35 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await UserService.login(EmailCnt.text.trim(), PassCnt.text);
       if (!mounted) return;
       if (user.token == null || user.token!.isEmpty) {
-        print('No Token');
+        await showNoticeDialog(
+          context: context,
+          title: 'Login failed',
+          message: 'Invalid email or password.',
+          type: NoticeType.error,
+        );
+        return;
       }
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => MainNavScreen(selectPageIndex: 0)),
       );
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
     } catch (e) {
       if (!mounted) return;
-      //
+      await showNoticeDialog(
+        context: context,
+        title: 'Login failed',
+        // message: e.toString(),
+        type: NoticeType.error,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -101,17 +123,21 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               decoration: InputDecoration(
                 labelText: 'Email',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
-          Padding(padding: EdgeInsets.only(bottom: 30)),
+          Padding(padding: EdgeInsets.only(bottom: 15)),
 
           // password
           SizedBox(
             width: 400,
             child: TextFormField(
               controller: PassCnt,
+              style: Theme.of(context).textTheme.bodyMedium,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return ("Please fill the password corectly.");
@@ -121,7 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
           ),
@@ -138,18 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
           SizedBox(
             width: 300,
             child: ElevatedButton.icon(
-              onPressed: _isLoading
-                  ? null
-                  : () async {
-                      if (!formkey.currentState!.validate()) return;
-                      setState(() => _isLoading = true);
-                      try {
-                        await _login();
-                        if (!mounted) return;
-                      } finally {
-                        if (mounted) setState(() => _isLoading = false);
-                      }
-                    },
+              onPressed: _isLoading ? null : _login,
               icon: _isLoading
                   ? const SizedBox(
                       width: 22,
@@ -168,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          Padding(padding: EdgeInsets.only(bottom: 10)),
+          Padding(padding: EdgeInsets.only(bottom: 20)),
           TextButton(
             onPressed: () {
               Navigator.push(
@@ -214,14 +231,26 @@ class _LoginScreenState extends State<LoginScreen> {
               } else {
                 // portrait
                 return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildHeader(400),
-                      _buildForm(context),
-                      _buildFooter(),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Welcome to GameNova.",
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ),
+                        _buildHeader(400),
+                        SizedBox(height: 20),
+                        _buildForm(context),
+                        SizedBox(height: 20),
+                        _buildFooter(),
+                      ],
+                    ),
                   ),
                 );
               }

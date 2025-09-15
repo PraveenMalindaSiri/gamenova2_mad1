@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gamenova2_mad1/core/utility/app_theme.dart';
 import 'package:gamenova2_mad1/views/pages/auth/login.dart';
 
 void main() {
@@ -13,8 +14,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      darkTheme: ThemeData.dark(),
-      theme: ThemeData.light(),
+      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       home: LoginScreen(),
     );
   }
