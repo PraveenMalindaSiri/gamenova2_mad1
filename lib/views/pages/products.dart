@@ -17,13 +17,29 @@ class _ProductsScreenState extends State<ProductsScreen> {
   List<Product> _shooterGames = [];
   List<Product> _racingGames = [];
 
+  final List<String> types = ['All', "Physical", "Digital"];
+  final List<String> platforms = ['All', "PC", "XBOX", "PS4", "PS5"];
+  final List<String> genres = ['All', "Shooter", "RPG", "Racing"];
+
+  String? _selectedType = "All";
+  String? _selectedPlatform = "All";
+  String? _selectedGenre = "All";
+
   bool _isLoading = true;
 
   Future<void> getSections() async {
     if (!mounted) return;
     setState(() => _isLoading = true);
     try {
-      final products = await ProductService.getAllProducts();
+      final type = _selectedType == 'All' ? '' : _selectedType;
+      final genre = _selectedGenre == 'All' ? '' : _selectedGenre;
+      final platform = _selectedPlatform == 'All' ? '' : _selectedPlatform;
+
+      final products = await ProductService.getAllProducts(
+        genre: genre,
+        platform: platform,
+        type: type,
+      );
 
       final rpg = <Product>[];
       final shooter = <Product>[];
@@ -49,12 +65,80 @@ class _ProductsScreenState extends State<ProductsScreen> {
         _racingGames = racing;
         _isLoading = false;
       });
-
-      if (mounted) setState(() => _isLoading = false);
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
       if (!mounted) return;
     }
+  }
+
+  Widget buildTypes(context, double width) {
+    return SizedBox(
+      width: width,
+      child: DropdownButtonFormField<String>(
+        isExpanded: true,
+        value: _selectedType,
+        items: types
+            .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+            .toList(),
+        onChanged: (value) {
+          setState(() {
+            _selectedType = value;
+          });
+          getSections();
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          labelText: "Select Edition",
+        ),
+      ),
+    );
+  }
+
+  Widget buildGenre(context, double width) {
+    return SizedBox(
+      width: width,
+      child: DropdownButtonFormField<String>(
+        value: _selectedGenre,
+        items: genres
+            .map((genre) => DropdownMenuItem(value: genre, child: Text(genre)))
+            .toList(),
+        onChanged: (value) {
+          setState(() {
+            _selectedGenre = value;
+          });
+          getSections();
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          labelText: "Select Genre",
+        ),
+      ),
+    );
+  }
+
+  Widget buildPlatform(context, double width) {
+    return SizedBox(
+      width: width,
+      child: DropdownButtonFormField<String>(
+        value: _selectedPlatform,
+        items: platforms
+            .map(
+              (platform) =>
+                  DropdownMenuItem(value: platform, child: Text(platform)),
+            )
+            .toList(),
+        onChanged: (value) {
+          setState(() {
+            _selectedPlatform = value;
+          });
+          getSections();
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          labelText: "Select Platforms",
+        ),
+      ),
+    );
   }
 
   @override
@@ -66,7 +150,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget _buildGenreSection(String title, List<Product> games) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkGray : Colors.white,
@@ -92,25 +176,27 @@ class _ProductsScreenState extends State<ProductsScreen> {
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
             SizedBox(
-              height: 350,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: games.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    child: GameCard(game: games[index]),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ProductViewScreen(game: games[index]),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+              height: games.isEmpty ? 100 : 350,
+              child: games.isEmpty
+                  ? Center(child: Text("No $title available."))
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: games.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          child: GameCard(game: games[index]),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductViewScreen(game: games[index]),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
           ],
@@ -121,27 +207,31 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    if (_rpgGames.isEmpty && _racingGames.isEmpty && _shooterGames.isEmpty) {
-      return const Scaffold(body: Center(child: Text("No Games available.")));
-    }
-
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            if (_rpgGames.isNotEmpty)
-              _buildGenreSection('RPG Games', _rpgGames),
-            if (_shooterGames.isNotEmpty)
-              _buildGenreSection('Shooter Games', _shooterGames),
-            if (_racingGames.isNotEmpty)
-              _buildGenreSection('Racing Games', _racingGames),
-          ],
-        ),
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child: Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        buildTypes(context, 120),
+                        buildGenre(context, 120),
+                        buildPlatform(context, 120),
+                      ],
+                    ),
+                  ),
+                  _buildGenreSection('RPG Games', _rpgGames),
+                  _buildGenreSection('Shooter Games', _shooterGames),
+                  _buildGenreSection('Racing Games', _racingGames),
+                  Padding(padding: EdgeInsetsGeometry.only(bottom: 10)),
+                ],
+              ),
+            ),
     );
   }
 }

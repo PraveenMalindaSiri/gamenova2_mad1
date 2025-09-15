@@ -44,15 +44,17 @@ class ProductService {
   }
 
   static Future<List<Product>> getAllProducts({
-    String type = '',
-    String genre = '',
-    String platform = '',
+    String? type,
+    String? genre,
+    String? platform,
   }) async {
     try {
       final params = <String, String>{};
-      if (type.isNotEmpty) params['type'] = type;
-      if (genre.isNotEmpty) params['genre'] = genre;
-      if (platform.isNotEmpty) params['platform'] = platform;
+      if (type != null && type.isNotEmpty) params['type'] = type;
+      if (genre != null && genre.isNotEmpty) params['genre'] = genre;
+      if (platform != null && platform.isNotEmpty) {
+        params['platform'] = platform;
+      }
 
       final url = Uri.http(
         basePath,

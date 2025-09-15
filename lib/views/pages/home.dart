@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
             SizedBox(
-              height: 350,
+              height: games.isEmpty ? 100 : 350,
               child: games.isEmpty
                   ? Center(child: Text("No $edition available."))
                   : ListView.separated(
