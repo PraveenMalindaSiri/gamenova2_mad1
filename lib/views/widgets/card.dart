@@ -1,10 +1,10 @@
 // ignore_for_file: unnecessary_brace_in_string_interps
 
 import 'package:flutter/material.dart';
-import 'package:mad_1_gamenova_1/core/game.dart';
+import 'package:gamenova2_mad1/core/models/product.dart';
 
 class GameCard extends StatelessWidget {
-  final Game game;
+  final Product game;
 
   const GameCard({super.key, required this.game});
 
@@ -29,7 +29,7 @@ class GameCard extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.asset(
-                  game.image,
+                  game.imageUrl,
                   fit: BoxFit.fill,
                   width: 200,
                   height: 200,
@@ -42,7 +42,7 @@ class GameCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    game.name,
+                    game.title,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,

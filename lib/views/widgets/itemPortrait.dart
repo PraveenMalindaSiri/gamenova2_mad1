@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mad_1_gamenova_1/core/colors.dart';
-import 'package:mad_1_gamenova_1/core/game.dart';
-import 'package:mad_1_gamenova_1/views/pages/product_view.dart';
-import 'package:mad_1_gamenova_1/views/widgets/button.dart';
+import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/utility/colors.dart';
+import 'package:gamenova2_mad1/views/pages/product_view.dart';
+import 'package:gamenova2_mad1/views/widgets/button.dart';
 
 class ItemPortraitView extends StatelessWidget {
-  final Game game;
+  final Product game;
   final int amount;
   final bool isWishlist;
   final VoidCallback onRemove;
@@ -61,7 +61,7 @@ class ItemPortraitView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Image.asset(
-                      game.image,
+                      game.imageUrl,
                       fit: BoxFit.fill,
                       height: 200,
                     ),
@@ -70,7 +70,7 @@ class ItemPortraitView extends StatelessWidget {
               ),
             ),
             Text(
-              game.name,
+              game.title,
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),

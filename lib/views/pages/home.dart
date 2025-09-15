@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
@@ -15,6 +16,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<Product> _latestGames = [];
+  List<Product> _featuredGames = [];
+  bool _isLoading = true;
+
+  Future<void> getSections() async {
+    setState(() => _isLoading = true);
+    print("object");
+    try {
+      final sections = await ProductService.getHomeSreenSections();
+      final List<Product> latest = sections['latest'] ?? [];
+      final List<Product> featured = sections['featured'] ?? [];
+
+      setState(() {
+        _latestGames = latest;
+        _featuredGames = featured;
+      });
+
+      if (mounted) setState(() => _isLoading = false);
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+      if (!mounted) return;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSections();
+  }
+
   Widget _buildIntro() {
     return Column(
       children: [
@@ -128,10 +159,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEditionSection(String edition, List<Product> games) {
+  Widget _buildSection(String edition, List<Product> games) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkGray : Colors.white,
@@ -181,24 +212,28 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(padding: EdgeInsets.only(bottom: 10)),
             SizedBox(
               height: 350,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    child: GameCard(game: games[index]),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ProductViewScreen(game: games[index]),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+              child: games.isEmpty
+                  ? Center(child: Text("No $edition available."))
+                  : ListView.separated(
+                      separatorBuilder: (_, __) =>
+                          const Padding(padding: EdgeInsets.all(5)),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: games.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          child: GameCard(game: games[index]),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductViewScreen(game: games[index]),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -210,15 +245,31 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth < 700) {
-              return Column(children: [_buildIntro()]);
-            } else {
-              return Column(children: [_buildIntroLand()]);
-            }
-          },
-        ),
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < 700) {
+                    return Column(
+                      children: [
+                        _buildIntro(),
+                        _buildSection('Latest Games', _latestGames),
+                        _buildSection("Featured Games", _featuredGames),
+                        Padding(padding: EdgeInsetsGeometry.only(bottom: 10)),
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        _buildIntroLand(),
+                        _buildSection('Latest Games', _latestGames),
+                        _buildSection("Featured Games", _featuredGames),
+                        Padding(padding: EdgeInsetsGeometry.only(bottom: 10)),
+                      ],
+                    );
+                  }
+                },
+              ),
       ),
     );
   }

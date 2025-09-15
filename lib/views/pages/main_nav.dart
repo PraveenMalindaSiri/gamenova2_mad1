@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mad_1_gamenova_1/core/colors.dart';
-import 'package:mad_1_gamenova_1/views/pages/cart.dart';
-import 'package:mad_1_gamenova_1/views/pages/home.dart';
-import 'package:mad_1_gamenova_1/views/pages/login.dart';
-import 'package:mad_1_gamenova_1/views/pages/products_screen.dart';
-import 'package:mad_1_gamenova_1/views/pages/wishlist.dart';
+import 'package:gamenova2_mad1/core/utility/colors.dart';
+import 'package:gamenova2_mad1/views/pages/auth/login.dart';
+import 'package:gamenova2_mad1/views/pages/customer/cart.dart';
+import 'package:gamenova2_mad1/views/pages/customer/wishlist.dart';
+import 'package:gamenova2_mad1/views/pages/home.dart';
+import 'package:gamenova2_mad1/views/pages/products.dart';
 
 class MainNavScreen extends StatefulWidget {
   final int selectPageIndex;
@@ -100,8 +100,8 @@ class _MainNavScreenState extends State<MainNavScreen> {
                         color: AppColors.darkSkyBlue,
                       ),
                     ),
-                    SizedBox(width: 5,),
-                    Icon(Icons.logout, size: 22,),
+                    SizedBox(width: 5),
+                    Icon(Icons.logout, size: 22),
                   ],
                 ),
               ),

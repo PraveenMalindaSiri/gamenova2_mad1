@@ -1,12 +1,11 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
-import 'package:mad_1_gamenova_1/core/game.dart';
-import 'package:mad_1_gamenova_1/core/games_lists.dart';
-import 'package:mad_1_gamenova_1/views/widgets/button.dart';
+import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/views/widgets/button.dart';
 
 class ProductViewScreen extends StatefulWidget {
-  final Game game;
+  final Product game;
 
   const ProductViewScreen({super.key, required this.game});
   @override
@@ -40,76 +39,12 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     );
   }
 
-  void addToWishlist(int amount, Game game) {
-    if (wishlistGames.containsKey(game) &&
-        game.type.toLowerCase() == 'digital') {
-      setState(() {
-        error = 'Already in the Wishlist cannot add more Digital Editions';
-      });
-      return;
-    }
-    if (wishlistGames.containsKey(game)) {
-      setState(() {
-        error = null;
-        wishlistGames[game] = wishlistGames[game]! + amount;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Added more ${amount.toString()} copies to the Wishlist',
-          ),
-          duration: Duration(milliseconds: 1000),
-        ),
-      );
-    } else {
-      setState(() {
-        wishlistGames[game] = amount;
-        error = null;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Added to wishlist'),
-          duration: Duration(milliseconds: 1000),
-        ),
-      );
-    }
+  void addToWishlist(int amount, Product game) {
+    //
   }
 
-  void addToCart(int amount, Game game) {
-    if (cartGames.containsKey(game) && game.type.toLowerCase() == 'digital') {
-      setState(() {
-        error = 'Already in the Cart cannot add more Digital Editions';
-      });
-      return;
-    }
-    // cheking if the key is in the list before adding
-    if (cartGames.containsKey(game)) {
-      // if exists update the amount
-      setState(() {
-        error = null;
-        cartGames[game] = cartGames[game]! + amount;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Added more ${amount.toString()} copies to the Cart'),
-          duration: Duration(milliseconds: 1000),
-        ),
-      );
-    } else {
-      // else add the new item
-      setState(() {
-        error = null;
-        cartGames[game] = amount;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Added to Cart'),
-          duration: Duration(milliseconds: 1000),
-        ),
-      );
-    }
+  void addToCart(int amount, Product game) {
+    //
   }
 
   Widget buildAmount() {
@@ -208,7 +143,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Text(
-              widget.game.name,
+              widget.game.title,
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium!.copyWith(fontSize: 24),
@@ -227,7 +162,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           ),
 
           // img
-          myIMG(widget.game.image, 300, 300),
+          myIMG(widget.game.imageUrl, 300, 300),
           Padding(padding: EdgeInsets.only(bottom: 10)),
 
           // stickers
@@ -267,7 +202,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           // details
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: buildDetails("Released Date:", widget.game.releasedDate),
+            child: buildDetails("Released Date:", widget.game.releasedAt!),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -331,7 +266,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
             Column(
               children: [
                 // IMG
-                myIMG(widget.game.image, 250, 250),
+                myIMG(widget.game.imageUrl, 250, 250),
 
                 // stickers
                 SizedBox(
@@ -367,7 +302,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 1.0),
                   child: Text(
-                    widget.game.name,
+                    widget.game.title,
                     style: Theme.of(
                       context,
                     ).textTheme.bodyMedium!.copyWith(fontSize: 24),
@@ -393,7 +328,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: buildDetails(
                           "Released Date:",
-                          widget.game.releasedDate,
+                          widget.game.releasedAt!,
                         ),
                       ),
                       Padding(

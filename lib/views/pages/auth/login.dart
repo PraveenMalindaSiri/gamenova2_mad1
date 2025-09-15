@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/service/user_service.dart';
 import 'package:gamenova2_mad1/views/pages/auth/register.dart';
+import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:social_media_buttons/social_media_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,9 +27,16 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final user = await UserService.login(EmailCnt.text, PassCnt.text);
-      print(user.token);
+      final user = await UserService.login(EmailCnt.text.trim(), PassCnt.text);
       if (!mounted) return;
+      if (user.token == null || user.token!.isEmpty) {
+        print('No Token');
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => MainNavScreen(selectPageIndex: 0)),
+      );
     } catch (e) {
       if (!mounted) return;
       //

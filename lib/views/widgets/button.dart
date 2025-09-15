@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
-import 'package:mad_1_gamenova_1/core/colors.dart';
+import 'package:gamenova2_mad1/core/utility/colors.dart';
 
 Widget MyButton(String name, Function func, Color mainColor) {
   return ElevatedButton(
