@@ -1,6 +1,6 @@
 import 'product.dart';
 
-class Cart {
+class CartItem {
   final int id;
   final int userId;
   final int productId;
@@ -9,7 +9,7 @@ class Cart {
   final String? createdAt;
   final String? updatedAt;
 
-  Cart({
+  CartItem({
     required this.id,
     required this.userId,
     required this.productId,
@@ -19,8 +19,8 @@ class Cart {
     this.updatedAt,
   });
 
-  factory Cart.fromJson(Map<String, dynamic> json) {
-    return Cart(
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
       id: json['id'] as int,
       userId: json['user_id'] as int,
       productId: json['product_id'] as int,

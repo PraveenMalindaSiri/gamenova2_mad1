@@ -1,6 +1,6 @@
 import 'product.dart';
 
-class Wishlist {
+class WishlistItem {
   final int id;
   final int userId;
   final int productId;
@@ -9,7 +9,7 @@ class Wishlist {
   final String? createdAt;
   final String? updatedAt;
 
-  Wishlist({
+  WishlistItem({
     required this.id,
     required this.userId,
     required this.productId,
@@ -19,8 +19,8 @@ class Wishlist {
     this.updatedAt,
   });
 
-  factory Wishlist.fromJson(Map<String, dynamic> json) {
-    return Wishlist(
+  factory WishlistItem.fromJson(Map<String, dynamic> json) {
+    return WishlistItem(
       id: json['id'] as int,
       userId: json['user_id'] as int,
       productId: json['product_id'] as int,
