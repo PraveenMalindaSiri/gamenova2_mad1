@@ -1,5 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/models/wishlist.dart';
+import 'package:gamenova2_mad1/core/service/wishlist_service.dart';
+import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:gamenova2_mad1/views/widgets/itemLanscape.dart';
+import 'package:gamenova2_mad1/views/widgets/itemPortrait.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -9,29 +15,147 @@ class WishlistScreen extends StatefulWidget {
 }
 
 class _WishlistScreenState extends State<WishlistScreen> {
-  void remove(Product game) {
-    //
+  List<WishlistItem> _wishlist = [];
+  bool _isLoading = true;
+
+  Future<void> loadWishlist() async {
+    setState(() => _isLoading = true);
+    try {
+      final list = await WishlistService.getWishlist("asd");
+
+      setState(() {
+        _wishlist = list;
+      });
+
+      if (mounted) setState(() => _isLoading = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Loading Wishlist failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
   }
 
-  void addToCart(int amount, Product game) {}
+  Future<void> addToCart(WishlistItem item) async {
+    try {
+      // await CartService.addToCart(
+      //   token: _token,
+      //   productId: item.productId,
+      //   quantity: item.quantity,
+      // );
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Added to cart',
+        message: "'${item.product.title}' moved to cart.",
+        type: NoticeType.success,
+      );
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Loading Wishlist failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
+  Future<void> remove(WishlistItem item) async {
+    try {
+      // await WishlistService.deleteWishlistItem(token: _token, id: item.id);
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Removed',
+        message: "'${item.product.title}' removed from wishlist.",
+        type: NoticeType.success,
+      );
+      loadWishlist();
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Deleting item failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadWishlist();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return ListView.builder(
-            // itemCount: entries.length,
-            itemBuilder: (context, index) {
-              if (constraints.maxWidth > 800) {
-                //
-              } else {
-                //
-              }
-            },
-          );
-        },
-      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _wishlist.isEmpty
+          ? Center(child: Text("No Wishlist available."))
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                return ListView.builder(
+                  itemCount: _wishlist.length,
+                  itemBuilder: (context, index) {
+                    final item = _wishlist[index];
+                    if (constraints.maxWidth > 800) {
+                      return ItemLanscapeView(
+                        amount: item.quantity,
+                        game: item.product,
+                        isWishlist: true,
+                        onCart: () => addToCart(item),
+                        onRemove: () => remove(item),
+                      );
+                    } else {
+                      return ItemPortraitView(
+                        amount: item.quantity,
+                        game: item.product,
+                        isWishlist: true,
+                        onCart: () => addToCart(item),
+                        onRemove: () => remove(item),
+                      );
+                    }
+                  },
+                );
+              },
+            ),
     );
   }
 }

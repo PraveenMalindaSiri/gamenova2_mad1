@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getSections() async {
     setState(() => _isLoading = true);
-    print("object");
+    // print("object");
     try {
       final sections = await ProductService.getHomeSreenSections();
       final List<Product> latest = sections['latest'] ?? [];

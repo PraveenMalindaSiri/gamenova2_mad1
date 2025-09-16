@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/models/cart.dart';
+import 'package:gamenova2_mad1/core/service/cart_service.dart';
 import 'package:gamenova2_mad1/views/pages/customer/payment.dart';
 import 'package:gamenova2_mad1/views/widgets/button.dart';
+import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/itemLanscape.dart';
 import 'package:gamenova2_mad1/views/widgets/itemPortrait.dart';
 
@@ -13,12 +17,84 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  List<CartItem> _cart = [];
+  bool _isLoading = true;
+
   bool agreed = false;
   double totalPrice = 0;
   String? error;
 
-  void remove(Product game) {
-    //
+  Future<void> loadCart() async {
+    setState(() => _isLoading = true);
+    try {
+      final list = await CartService.getCart('token');
+
+      setState(() {
+        _cart = list;
+        _isLoading = false;
+      });
+      calcCartTotal();
+      if (mounted) setState(() => _isLoading = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Loading Cart failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
+  Future<void> remove(CartItem item) async {
+    try {
+      // await CartService.deleteCartItem(id: id);
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Removed',
+        message: "'${item.product.title}' removed from Cart.",
+        type: NoticeType.success,
+      );
+      loadCart();
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Deleteing item failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
+  void calcCartTotal() {
+    double sum = 0;
+    for (final item in _cart) {
+      final price = double.tryParse(item.product.price.toString()) ?? 0;
+      sum += price * item.quantity;
+    }
+    setState(() => totalPrice = sum);
   }
 
   void checkout(total) {
@@ -79,20 +155,35 @@ class _CartScreenState extends State<CartScreen> {
       body: Column(
         children: [
           Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return ListView.builder(
-                  // itemCount: ,
-                  itemBuilder: (context, index) {
-                    if (constraints.maxWidth > 800) {
-                      //
-                    } else {
-                      //
-                    }
-                  },
-                );
-              },
-            ),
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : _cart.isEmpty
+                ? Center(child: Text("No Cart available."))
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ListView.builder(
+                        itemCount: _cart.length,
+                        itemBuilder: (context, index) {
+                          final item = _cart[index];
+                          if (constraints.maxWidth > 800) {
+                            return ItemLanscapeView(
+                              amount: item.quantity,
+                              game: item.product,
+                              isWishlist: false,
+                              onRemove: () => remove(item),
+                            );
+                          } else {
+                            return ItemPortraitView(
+                              amount: item.quantity,
+                              game: item.product,
+                              isWishlist: false,
+                              onRemove: () => remove(item),
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
           ),
           buildTotalPrice(),
         ],

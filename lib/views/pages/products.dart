@@ -48,7 +48,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       final shooter = <Product>[];
       final racing = <Product>[];
 
-      print(products);
+      // print(products);
 
       for (final p in products) {
         final genre = p.genre.toLowerCase().trim();
