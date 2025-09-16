@@ -117,6 +117,12 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    loadCart();
+  }
+
   Widget buildTotalPrice() {
     return Column(
       children: [

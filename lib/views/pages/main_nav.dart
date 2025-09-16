@@ -47,15 +47,23 @@ class _MainNavScreenState extends State<MainNavScreen> {
     );
   }
 
+  Widget _buildPage(int i) {
+    switch (i) {
+      case 0:
+        return HomeScreen(onGoToTab: _navigate);
+      case 1:
+        return const ProductsScreen();
+      case 2:
+        return const WishlistScreen();
+      case 3:
+        return const CartScreen();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _pages = [
-      HomeScreen(onGoToTab: _navigate),
-      ProductsScreen(),
-      WishlistScreen(),
-      CartScreen(),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 40,
@@ -114,7 +122,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
       ),
 
       // Keep tab states alive
-      body: IndexedStack(index: _index, children: _pages),
+      body: _buildPage(_index),
 
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),

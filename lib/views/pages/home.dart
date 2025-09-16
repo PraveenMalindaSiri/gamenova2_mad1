@@ -264,10 +264,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : LayoutBuilder(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: LayoutBuilder(
                 builder: (context, constraints) {
                   if (constraints.maxWidth < 700) {
                     return Column(
@@ -290,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
               ),
-      ),
+            ),
     );
   }
 }

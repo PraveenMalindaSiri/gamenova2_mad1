@@ -7,9 +7,9 @@ class Product {
   final double price;
   final String company;
   final String? releasedAt;
-  final String size;
+  final double size;
   final String duration;
-  final String ageRating;
+  final int ageRating;
   final String description;
   final String imageUrl;
   final int sellerId;
@@ -46,10 +46,10 @@ class Product {
       platform: json['platform'] as String,
       price: (json['price'] as num).toDouble(),
       company: json['company'] as String,
-      releasedAt: json['released_at'],
-      size: json['size'] as String,
+      releasedAt: json['released_date'],
+      size: json['size'] as double,
       duration: json['duration'] as String,
-      ageRating: json['age_rating'] as String,
+      ageRating: json['age_rating'] as int,
       description: json['description'] as String,
       imageUrl: json['image_url'] as String,
       sellerId: json['seller_id'] as int,

@@ -48,9 +48,11 @@ class _ManageGameState extends State<ManageGame> {
     durationController = TextEditingController(
       text: widget.game?.duration ?? '',
     );
-    sizeController = TextEditingController(text: widget.game?.size ?? '');
+    sizeController = TextEditingController(
+      text: widget.game?.size.toString() ?? '',
+    );
     ageRatingController = TextEditingController(
-      text: widget.game?.ageRating ?? '',
+      text: widget.game?.ageRating.toString() ?? '',
     );
     companyController = TextEditingController(text: widget.game?.company ?? '');
     priceController = TextEditingController(
