@@ -2,17 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:gamenova2_mad1/views/widgets/text_field.dart';
 
-class CreateGame extends StatefulWidget {
+class ManageGame extends StatefulWidget {
   final Product? game;
-  const CreateGame({super.key, this.game});
+  const ManageGame({super.key, this.game});
 
   @override
-  State<CreateGame> createState() => _CreateGameState();
+  State<ManageGame> createState() => _ManageGameState();
 }
 
-class _CreateGameState extends State<CreateGame> {
+class _ManageGameState extends State<ManageGame> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController titleController;
   late final TextEditingController descriptionController;
@@ -21,6 +23,7 @@ class _CreateGameState extends State<CreateGame> {
   late final TextEditingController ageRatingController;
   late final TextEditingController companyController;
   late final TextEditingController priceController;
+  late final TextEditingController releasedController;
 
   final List<String> types = ["Physical", "Digital"];
   final List<String> platforms = ["PC", "XBOX", "PS4", "PS5"];
@@ -53,12 +56,9 @@ class _CreateGameState extends State<CreateGame> {
     priceController = TextEditingController(
       text: widget.game?.price.toString() ?? '',
     );
-
-    if (widget.game != null) {
-      _selectedType = widget.game!.type;
-      _selectedGenre = widget.game!.genre;
-      _selectedPlatform = widget.game!.platform;
-    }
+    releasedController = TextEditingController(
+      text: widget.game?.releasedAt ?? '',
+    );
   }
 
   Future<void> create() async {
@@ -74,6 +74,7 @@ class _CreateGameState extends State<CreateGame> {
         message: 'Please fill all the details.',
         type: NoticeType.error,
       );
+      return;
     }
 
     final price = double.tryParse(priceController.text.trim()) ?? 0;
@@ -89,9 +90,10 @@ class _CreateGameState extends State<CreateGame> {
       'type': (_selectedType ?? '').toLowerCase(),
       'platform': _selectedPlatform,
       'genre': _selectedGenre,
+      'released_date': releasedController.text,
     };
     try {
-      // create
+      await ProductService.createProduct(data: data);
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -125,18 +127,10 @@ class _CreateGameState extends State<CreateGame> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
-    if (_selectedPlatform!.isEmpty) {
-      await showNoticeDialog(
-        context: context,
-        title: 'Missing Inputs',
-        message: 'Please fill all the details.',
-        type: NoticeType.error,
-      );
-    }
-
     final price = double.tryParse(priceController.text.trim()) ?? 0;
     final age = int.tryParse(ageRatingController.text.trim()) ?? 0;
     final data = {
+      'id': widget.game!.id,
       'title': titleController.text.trim(),
       'description': descriptionController.text.trim(),
       'duration': durationController.text.trim(),
@@ -144,13 +138,14 @@ class _CreateGameState extends State<CreateGame> {
       'age_rating': age,
       'company': companyController.text.trim(),
       'price': price,
-      'type': (_selectedType ?? '').toLowerCase(),
-      'platform': _selectedPlatform,
-      'genre': _selectedGenre,
+      'type': widget.game!.type.toLowerCase(),
+      'platform': widget.game!.platform,
+      'genre': widget.game!.genre,
+      'released_date': releasedController.text,
     };
 
     try {
-      // update
+      await ProductService.updateProduct(data: data, id: widget.game!.id);
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -180,6 +175,101 @@ class _CreateGameState extends State<CreateGame> {
     }
   }
 
+  Future<void> delete() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Remove Game?'),
+        content: Text('This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      await ProductService.deleteProduct();
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Deleted',
+        message: 'Game Deleted successfully.',
+        type: NoticeType.success,
+      );
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isSaving = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Deleting game failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
+  Widget readOnlyField(String label, String value) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.9,
+      child: TextFormField(
+        initialValue: value,
+        readOnly: true,
+        enableInteractiveSelection: false,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          suffixIcon: const Icon(Icons.lock),
+        ),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+    );
+  }
+
+  Widget buildDate(context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.9,
+      child: MyTextField(
+        context,
+        releasedController,
+        "Released Date",
+        prefixIcon: Icons.calendar_month,
+        readOnly: true,
+        onTap: () async {
+          final now = DateTime.now();
+          final picked = await showDatePicker(
+            context: context,
+            initialDate: DateTime(now.year - 18, now.month, now.day),
+            firstDate: DateTime(1900),
+            lastDate: DateTime(now.year, now.month, now.day),
+          );
+          if (picked != null) {
+            releasedController.text = picked.toIso8601String().split('T').first;
+          }
+        },
+        validator: (value) => ProductValidation.validReleasedDate(value),
+      ),
+    );
+  }
+
   Widget buildTypes(context, double width) {
     return SizedBox(
       width: width,
@@ -197,6 +287,7 @@ class _CreateGameState extends State<CreateGame> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           labelText: "Select Edition",
         ),
+        validator: (value) => ProductValidation.validType(value),
       ),
     );
   }
@@ -218,6 +309,7 @@ class _CreateGameState extends State<CreateGame> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           labelText: "Select Genre",
         ),
+        validator: (value) => ProductValidation.validGenre(value),
       ),
     );
   }
@@ -242,11 +334,10 @@ class _CreateGameState extends State<CreateGame> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           labelText: "Select Platforms",
         ),
+        validator: (value) => ProductValidation.validPlatform(value),
       ),
     );
   }
-
-  
 
   @override
   void dispose() {
@@ -257,11 +348,230 @@ class _CreateGameState extends State<CreateGame> {
     ageRatingController.dispose();
     companyController.dispose();
     priceController.dispose();
+    releasedController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Padding(padding: EdgeInsets.only(bottom: 30)),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: Column(
+                        children: [
+                          widget.game == null
+                              ? Text("Create a new Game")
+                              : Text("Update game: ${widget.game!.title}"),
+                          Padding(padding: EdgeInsets.only(bottom: 10)),
+
+                          MyTextField(
+                            context,
+                            titleController,
+                            "Title",
+                            prefixIcon: Icons.title,
+                            validator: (value) =>
+                                ProductValidation.validTitle(value),
+                          ),
+
+                          MyTextField(
+                            context,
+                            descriptionController,
+                            "Description",
+                            prefixIcon: Icons.description,
+                            validator: (value) =>
+                                ProductValidation.validDescription(value),
+                          ),
+
+                          MyTextField(
+                            context,
+                            durationController,
+                            "Duration",
+                            prefixIcon: Icons.timelapse_outlined,
+                            validator: (value) =>
+                                ProductValidation.validDuration(value),
+                          ),
+
+                          MyTextField(
+                            context,
+                            sizeController,
+                            "Size",
+                            // prefixIcon: Icons.,
+                            validator: (value) =>
+                                ProductValidation.validSize(value),
+                          ),
+
+                          MyTextField(
+                            context,
+                            ageRatingController,
+                            "Age Rating",
+                            // prefixIcon: Icons.age,
+                            validator: (value) =>
+                                ProductValidation.validAgeRating(value),
+                          ),
+
+                          MyTextField(
+                            context,
+                            companyController,
+                            "Company",
+                            prefixIcon: Icons.business,
+                            validator: (value) =>
+                                ProductValidation.validCompany(value),
+                          ),
+
+                          MyTextField(
+                            context,
+                            priceController,
+                            "Price",
+                            prefixIcon: Icons.attach_money_rounded,
+                            validator: (value) =>
+                                ProductValidation.validPrice(value),
+                          ),
+
+                          buildDate(context),
+                        ],
+                      ),
+                    ),
+
+                    if (widget.game == null)
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          if (constraints.maxWidth > 800) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                buildGenre(
+                                  context,
+                                  MediaQuery.of(context).size.width * 0.3,
+                                ),
+                                SizedBox(width: 20),
+
+                                buildTypes(
+                                  context,
+                                  MediaQuery.of(context).size.width * 0.3,
+                                ),
+                                SizedBox(width: 20),
+
+                                buildPlatform(
+                                  context,
+                                  MediaQuery.of(context).size.width * 0.3,
+                                ),
+                                SizedBox(width: 20),
+                              ],
+                            );
+                          } else {
+                            return Column(
+                              children: [
+                                buildGenre(
+                                  context,
+                                  MediaQuery.of(context).size.width * 0.9,
+                                ),
+                                SizedBox(height: 20),
+
+                                buildPlatform(
+                                  context,
+                                  MediaQuery.of(context).size.width * 0.9,
+                                ),
+                                SizedBox(height: 20),
+
+                                buildTypes(
+                                  context,
+                                  MediaQuery.of(context).size.width * 0.9,
+                                ),
+                                SizedBox(height: 20),
+                              ],
+                            );
+                          }
+                        },
+                      ),
+
+                    if (widget.game != null) ...[
+                      SizedBox(height: 15),
+                      readOnlyField('Type', (widget.game!.type.toUpperCase())),
+                      SizedBox(height: 15),
+                      readOnlyField('Genre', widget.game!.genre),
+                      SizedBox(height: 15),
+                      readOnlyField('Platform', widget.game!.platform),
+                      SizedBox(height: 20),
+                    ],
+
+                    SizedBox(
+                      width: MediaQuery.sizeOf(context).width * 0.5,
+                      child: ElevatedButton.icon(
+                        onPressed: _isSaving
+                            ? null
+                            : widget.game == null
+                            ? create
+                            : update,
+                        icon: _isSaving
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : widget.game == null
+                            ? Icon(Icons.add)
+                            : Icon(Icons.edit),
+                        label: const Text(
+                          'SAVE',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          minimumSize: const Size.fromHeight(48),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+
+                    if (widget.game != null &&
+                        widget.game!.sellerId.toString() == '')
+                      SizedBox(
+                        width: MediaQuery.sizeOf(context).width * 0.5,
+                        child: ElevatedButton.icon(
+                          onPressed: _isSaving ? null : delete,
+                          icon: _isSaving
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.delete),
+                          label: const Text(
+                            'DELETE',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            minimumSize: const Size.fromHeight(48),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

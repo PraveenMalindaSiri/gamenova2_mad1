@@ -7,6 +7,7 @@ import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
+import 'package:gamenova2_mad1/views/pages/seller/create.dart';
 import 'package:gamenova2_mad1/views/widgets/card.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 
@@ -238,6 +239,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               MaterialPageRoute(
                                 builder: (context) =>
                                     ProductViewScreen(game: games[index]),
+                              ),
+                            );
+                          },
+                          onDoubleTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ManageGame(game: games[index]),
                               ),
                             );
                           },
