@@ -107,6 +107,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
         quantity: newQty,
       );
 
+      print(item.product.type);
+
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -207,6 +209,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         isWishlist: true,
                         onCart: () => addToCart(item),
                         onRemove: () => remove(item),
+                        onUpdate: (delta) => updateWishlistAmount(item, delta),
                       );
                     }
                   },

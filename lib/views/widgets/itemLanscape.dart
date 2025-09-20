@@ -23,7 +23,7 @@ class ItemLanscapeView extends StatelessWidget {
 
   Widget updateWishlistAmnt(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
@@ -107,8 +107,9 @@ class ItemLanscapeView extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  if (game.type != 'digital') updateWishlistAmnt(context),
-                  if (game.type == 'digital')
+                  if (game.type.toLowerCase() != 'digital')
+                    updateWishlistAmnt(context),
+                  if (game.type.toLowerCase() == 'digital')
                     Text(
                       "x $amount",
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(

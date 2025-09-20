@@ -23,7 +23,7 @@ class ItemPortraitView extends StatelessWidget {
 
   Widget updateWishlistAmnt(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
@@ -103,9 +103,10 @@ class ItemPortraitView extends StatelessWidget {
             Padding(padding: EdgeInsets.only(bottom: 10)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (game.type != 'digital') updateWishlistAmnt(context),
-                if (game.type == 'digital')
+                if (game.type.toLowerCase() != 'digital') updateWishlistAmnt(context),
+                if (game.type.toLowerCase() == 'digital')
                   Text(
                     "x $amount",
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
