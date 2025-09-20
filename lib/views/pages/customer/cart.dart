@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/cart.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/cart_service.dart';
 import 'package:gamenova2_mad1/views/pages/customer/payment.dart';
 import 'package:gamenova2_mad1/views/widgets/button.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/itemLanscape.dart';
 import 'package:gamenova2_mad1/views/widgets/itemPortrait.dart';
+import 'package:provider/provider.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -27,7 +29,10 @@ class _CartScreenState extends State<CartScreen> {
   Future<void> loadCart() async {
     setState(() => _isLoading = true);
     try {
-      final list = await CartService.getCart('token');
+      final auth = context.read<AuthProvider>();
+      final token = auth.token ?? '';
+
+      final list = await CartService.getCart(token);
 
       setState(() {
         _cart = list;

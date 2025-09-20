@@ -2,14 +2,8 @@ class User {
   final int id;
   final String name;
   final String email;
-  final DateTime? emailVerifiedAt;
   final String? password;
   final String? confPassword;
-  final String? twoFactorSecret;
-  final String? twoFactorRecoveryCodes;
-  final DateTime? twoFactorConfirmedAt;
-  final String? rememberToken;
-  final int? currentTeamId;
   final String? profilePhotoPath;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -24,14 +18,8 @@ class User {
     required this.id,
     required this.name,
     required this.email,
-    this.emailVerifiedAt,
     this.password,
     this.confPassword,
-    this.twoFactorSecret,
-    this.twoFactorRecoveryCodes,
-    this.twoFactorConfirmedAt,
-    this.rememberToken,
-    this.currentTeamId,
     this.profilePhotoPath,
     this.createdAt,
     this.updatedAt,
@@ -48,17 +36,7 @@ class User {
       id: json['id'] as int,
       name: json['name'] as String,
       email: json['email'] as String,
-      emailVerifiedAt: json['email_verified_at'] != null
-          ? DateTime.parse(json['email_verified_at'])
-          : null,
       password: json['password'] as String?,
-      twoFactorSecret: json['two_factor_secret'],
-      twoFactorRecoveryCodes: json['two_factor_recovery_codes'],
-      twoFactorConfirmedAt: json['two_factor_confirmed_at'] != null
-          ? DateTime.parse(json['two_factor_confirmed_at'])
-          : null,
-      rememberToken: json['remember_token'],
-      currentTeamId: json['current_team_id'],
       profilePhotoPath: json['profile_photo_path'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])

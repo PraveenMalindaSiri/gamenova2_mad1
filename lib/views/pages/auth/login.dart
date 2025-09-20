@@ -3,10 +3,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:gamenova2_mad1/core/service/user_service.dart';
-import 'package:gamenova2_mad1/views/pages/auth/register.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
+  import 'package:gamenova2_mad1/views/pages/auth/register.dart';
 import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:provider/provider.dart';
 import 'package:social_media_buttons/social_media_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,9 +31,11 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final user = await UserService.login(EmailCnt.text.trim(), PassCnt.text);
+      final auth = context.read<AuthProvider>();
+      await auth.login(EmailCnt.text.trim(), PassCnt.text);
+
       if (!mounted) return;
-      if (user.token == null || user.token!.isEmpty) {
+      if (!auth.isLoggedIn) {
         await showNoticeDialog(
           context: context,
           title: 'Login failed',

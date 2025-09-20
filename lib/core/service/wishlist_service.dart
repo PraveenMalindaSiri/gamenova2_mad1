@@ -13,7 +13,13 @@ class WishlistService {
       final url = Uri.http(base, wishlistPath);
 
       final response = await http
-          .get(url, headers: {'Content-Type': 'application/json'})
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
           .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
@@ -35,7 +41,7 @@ class WishlistService {
   }
 
   static Future<WishlistItem> addToWishlist({
-    // required String token,
+    required String token,
     required int productId,
     int quantity = 1,
   }) async {
@@ -47,7 +53,7 @@ class WishlistService {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
-              // 'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $token',
             },
             body: jsonEncode({'product_id': productId, 'quantity': quantity}),
           )
@@ -70,7 +76,7 @@ class WishlistService {
   }
 
   static Future<WishlistItem> updateWishlistItem({
-    // required String token,
+    required String token,
     required int id,
     required int quantity,
   }) async {
@@ -82,7 +88,7 @@ class WishlistService {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
-              // 'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $token',
             },
             body: jsonEncode({'quantity': quantity}),
           )
@@ -103,7 +109,7 @@ class WishlistService {
   }
 
   static Future<void> deleteWishlistItem({
-    // required String token,
+    required String token,
     required int id,
   }) async {
     try {
@@ -114,7 +120,7 @@ class WishlistService {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
-              // 'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $token',
             },
           )
           .timeout(const Duration(seconds: 30));

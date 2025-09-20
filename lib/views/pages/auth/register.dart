@@ -4,10 +4,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/user.dart';
-import 'package:gamenova2_mad1/core/service/user_service.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/views/pages/auth/login.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/text_field.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -48,6 +49,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     try {
+      final auth = context.read<AuthProvider>();
+
       final data = {
         "name": NameCnt.text.trim(),
         "email": EmailCnt.text.trim(),
@@ -60,9 +63,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         data["dob"] = dobText;
       }
 
-      final user = await UserService.register(data: data);
+      await auth.register(dataReg: data);
       if (!mounted) return;
-      if (user.token == null || user.token!.isEmpty) {
+      if (!auth.isLoggedIn) {
         await showNoticeDialog(
           context: context,
           title: 'Registration failed',

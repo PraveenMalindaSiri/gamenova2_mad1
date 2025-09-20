@@ -8,15 +8,20 @@ class UserService {
   // static const String loginPath = "https://gamenova.duckdns.org/api/login";
   // static const String registerPath =
   //     "https://gamenova.duckdns.org/api/register";
+
   static const String loginPath = "http://127.0.0.1:8000/api/login";
   static const String registerPath = "http://127.0.0.1:8000/api/register";
+  static const String logoutPath = "http://127.0.0.1:8000/api/logout";
 
   static Future<User> login(String email, String password) async {
     try {
       final response = await http
           .post(
             Uri.parse(loginPath),
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode({"email": email, "password": password}),
           )
           .timeout(const Duration(seconds: 30));
@@ -40,7 +45,10 @@ class UserService {
       final response = await http
           .post(
             Uri.parse(registerPath),
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
             body: jsonEncode(data),
           )
           .timeout(const Duration(seconds: 30));
@@ -56,6 +64,36 @@ class UserService {
       throw Exception('Connection timed out. Please try again.');
     } catch (e) {
       throw Exception('Registering failed: $e');
+    }
+  }
+
+  static Future<void> logout(String token) async {
+    if (token.isEmpty) {
+      return;
+    }
+
+    try {
+      final response = await http
+          .post(
+            Uri.parse(logoutPath),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      } else {
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to LogOut');
+      }
+    } on TimeoutException {
+      throw Exception('Connection timed out. Please try again.');
+    } catch (e) {
+      throw Exception('LogOut failed: $e');
     }
   }
 }

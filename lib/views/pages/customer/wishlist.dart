@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/wishlist.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/wishlist_service.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/itemLanscape.dart';
 import 'package:gamenova2_mad1/views/widgets/itemPortrait.dart';
+import 'package:provider/provider.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -21,7 +23,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
   Future<void> loadWishlist() async {
     setState(() => _isLoading = true);
     try {
-      final list = await WishlistService.getWishlist("asd");
+      final auth = context.read<AuthProvider>();
+      final token = auth.token ?? '';
+
+      final list = await WishlistService.getWishlist(token);
 
       setState(() {
         _wishlist = list;
