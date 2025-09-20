@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/views/widgets/image_container.dart';
 
 class GameCard extends StatelessWidget {
   final Product game;
@@ -28,12 +29,7 @@ class GameCard extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  "assets/images/main/login_img.png",
-                  fit: BoxFit.fill,
-                  width: 200,
-                  height: 200,
-                ),
+                child: productImage(game.imageUrl, 200),
               ),
             ),
             Padding(

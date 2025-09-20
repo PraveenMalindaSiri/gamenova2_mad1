@@ -3,6 +3,7 @@ import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
 import 'package:gamenova2_mad1/views/widgets/button.dart';
+import 'package:gamenova2_mad1/views/widgets/image_container.dart';
 
 class ItemPortraitView extends StatelessWidget {
   final Product game;
@@ -85,11 +86,7 @@ class ItemPortraitView extends StatelessWidget {
                       border: Border.all(color: Colors.black, width: 2),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: Image.asset(
-                      game.imageUrl,
-                      fit: BoxFit.fill,
-                      height: 200,
-                    ),
+                    child: productImage(game.imageUrl, 200),
                   ),
                 ),
               ),
@@ -105,7 +102,8 @@ class ItemPortraitView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (game.type.toLowerCase() != 'digital') updateWishlistAmnt(context),
+                if (game.type.toLowerCase() != 'digital')
+                  updateWishlistAmnt(context),
                 if (game.type.toLowerCase() == 'digital')
                   Text(
                     "x $amount",

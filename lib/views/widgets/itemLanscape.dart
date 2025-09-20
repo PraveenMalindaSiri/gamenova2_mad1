@@ -3,6 +3,7 @@ import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
 import 'package:gamenova2_mad1/views/widgets/button.dart';
+import 'package:gamenova2_mad1/views/widgets/image_container.dart';
 
 class ItemLanscapeView extends StatelessWidget {
   final Product game;
@@ -86,11 +87,7 @@ class ItemLanscapeView extends StatelessWidget {
                         border: Border.all(color: Colors.black, width: 2),
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      child: Image.asset(
-                        game.imageUrl,
-                        fit: BoxFit.fill,
-                        height: 200,
-                      ),
+                      child: productImage(game.imageUrl, 200),
                     ),
                   ),
                 ),
