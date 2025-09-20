@@ -8,7 +8,8 @@ import 'package:gamenova2_mad1/views/widgets/text_field.dart';
 
 class ManageGame extends StatefulWidget {
   final Product? game;
-  const ManageGame({super.key, this.game});
+  final String token;
+  const ManageGame({super.key, this.game, required this.token});
 
   @override
   State<ManageGame> createState() => _ManageGameState();
@@ -95,7 +96,7 @@ class _ManageGameState extends State<ManageGame> {
       'released_date': releasedController.text,
     };
     try {
-      await ProductService.createProduct(data: data);
+      await ProductService.createProduct(data: data, token: widget.token);
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -147,7 +148,11 @@ class _ManageGameState extends State<ManageGame> {
     };
 
     try {
-      await ProductService.updateProduct(data: data, id: widget.game!.id);
+      await ProductService.updateProduct(
+        data: data,
+        id: widget.game!.id,
+        token: widget.token,
+      );
       if (!mounted) return;
       await showNoticeDialog(
         context: context,

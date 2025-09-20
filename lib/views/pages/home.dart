@@ -4,12 +4,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
 import 'package:gamenova2_mad1/views/pages/seller/create.dart';
 import 'package:gamenova2_mad1/views/widgets/card.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(int)? onGoToTab;
@@ -57,6 +59,21 @@ class _HomeScreenState extends State<HomeScreen> {
         type: NoticeType.error,
       );
     }
+  }
+
+  void redirectSeller(Product game) {
+    final auth = context.read<AuthProvider>();
+    final token = auth.token ?? '';
+    final role = auth.role ?? '';
+    // print(role);
+    if (role != 'seller') return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ManageGame(game: game, token: token),
+      ),
+    );
   }
 
   @override
@@ -242,15 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           },
-                          onDoubleTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ManageGame(game: games[index]),
-                              ),
-                            );
-                          },
+                          onDoubleTap: () => redirectSeller(games[index]),
                         );
                       },
                     ),

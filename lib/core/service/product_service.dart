@@ -86,7 +86,7 @@ class ProductService {
 
   static Future<void> createProduct({
     required Map<String, dynamic> data,
-    // required String token,
+    required String token,
   }) async {
     try {
       final url = Uri.parse('$basePath$productsPath');
@@ -96,7 +96,7 @@ class ProductService {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
-              // 'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $token',
             },
             body: jsonEncode({data}),
           )
@@ -118,7 +118,7 @@ class ProductService {
   static Future<void> updateProduct({
     required Map<String, dynamic> data,
     required int id,
-    // required String token,
+    required String token,
   }) async {
     try {
       final url = Uri.parse('$basePath$productsPath/$id');
@@ -128,7 +128,7 @@ class ProductService {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
-              // 'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $token',
             },
             body: jsonEncode({data}),
           )

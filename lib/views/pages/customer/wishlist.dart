@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/wishlist.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
+import 'package:gamenova2_mad1/core/service/cart_service.dart';
 import 'package:gamenova2_mad1/core/service/wishlist_service.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/itemLanscape.dart';
@@ -56,11 +57,14 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   Future<void> addToCart(WishlistItem item) async {
     try {
-      // await CartService.addToCart(
-      //   token: _token,
-      //   productId: item.productId,
-      //   quantity: item.quantity,
-      // );
+      final auth = context.read<AuthProvider>();
+      final token = auth.token ?? '';
+
+      await CartService.addToCart(
+        token: token,
+        productId: item.productId,
+        quantity: item.quantity,
+      );
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -91,7 +95,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   Future<void> remove(WishlistItem item) async {
     try {
-      // await WishlistService.deleteWishlistItem(token: _token, id: item.id);
+      final auth = context.read<AuthProvider>();
+      final token = auth.token ?? '';
+
+      await WishlistService.deleteWishlistItem(token: token, id: item.id);
       if (!mounted) return;
       await showNoticeDialog(
         context: context,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/auth/login.dart';
 import 'package:gamenova2_mad1/views/pages/customer/cart.dart';
@@ -6,6 +7,7 @@ import 'package:gamenova2_mad1/views/pages/customer/wishlist.dart';
 import 'package:gamenova2_mad1/views/pages/home.dart';
 import 'package:gamenova2_mad1/views/pages/products.dart';
 import 'package:gamenova2_mad1/views/widgets/navbar.dart';
+import 'package:provider/provider.dart';
 
 class MainNavScreen extends StatefulWidget {
   final int selectPageIndex;
@@ -93,7 +95,15 @@ class _MainNavScreenState extends State<MainNavScreen> {
                 child: _drawerItem("Cart", 3),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  final auth = context.read<AuthProvider>();
+                  // print(auth.token);
+
+                  if (auth.isLoggedIn) {
+                    await auth.logout();
+                    // print(auth.token);
+                  }
+                  if (!mounted) return;
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(

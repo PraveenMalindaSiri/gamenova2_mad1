@@ -1,8 +1,14 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
+import 'package:gamenova2_mad1/core/service/wishlist_service.dart';
 import 'package:gamenova2_mad1/views/widgets/button.dart';
+import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:provider/provider.dart';
 
 class ProductViewScreen extends StatefulWidget {
   final Product game;
@@ -17,6 +23,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   String? error;
   final AmountCnt = TextEditingController(text: "1");
   final formkey = GlobalKey<FormState>();
+  bool _isLoading = true;
 
   Widget myIMG(String path, double width, double height) {
     return Padding(
@@ -39,11 +46,91 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     );
   }
 
-  void addToWishlist(int amount, Product game) {
-    //
+  Future<void> addToWishlist(int amount, Product game) async {
+    setState(() => _isLoading = true);
+
+    try {
+      final auth = context.read<AuthProvider>();
+      final token = auth.token ?? '';
+
+      await WishlistService.addToWishlist(
+        token: token,
+        productId: game.id,
+        quantity: amount,
+      );
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Added to Wishlist',
+        message: "'${game.title}' added to Wishlist.",
+        type: NoticeType.success,
+      );
+      if (mounted) setState(() => _isLoading = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Adding to Wishlist failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
   }
 
-  void addToCart(int amount, Product game) {
+  Future<void> updateWishlistAmount(int amount, Product game) async {
+    setState(() => _isLoading = true);
+
+    try {
+      final auth = context.read<AuthProvider>();
+      final token = auth.token ?? '';
+
+      await WishlistService.updateWishlistItem(
+        token: token,
+        id: game.id,
+        quantity: amount,
+      );
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Updated Wishlist',
+        message: "'${game.title}'updated Wishlist amount.",
+        type: NoticeType.success,
+      );
+      if (mounted) setState(() => _isLoading = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Updating Wishlist failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
+  Future<void> addToCart(int amount, Product game) async {
     //
   }
 
