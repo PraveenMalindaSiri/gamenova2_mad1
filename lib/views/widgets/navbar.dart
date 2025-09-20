@@ -4,16 +4,14 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 class MyNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
-  // final String userRole;
+  final String userRole;
 
   const MyNavigation({
     super.key,
     required this.currentIndex,
-    // required this.userRole,
+    required this.userRole,
     required this.onTap,
   });
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +29,7 @@ class MyNavigation extends StatelessWidget {
         onTabChange: onTap,
         gap: 6,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        tabBackgroundColor: isDark? Colors.white: Colors.black,
+        tabBackgroundColor: isDark ? Colors.white : Colors.black,
         backgroundColor: Colors.transparent, // Nav bar background
         activeColor: Theme.of(
           context,
@@ -42,8 +40,16 @@ class MyNavigation extends StatelessWidget {
         tabs: [
           GButton(icon: Icons.home, text: "Home"),
           GButton(icon: Icons.games, text: "Games"),
-          GButton(icon: Icons.favorite, text: "Wishlist"),
-          GButton(icon: Icons.shopping_bag, text: "Cart"),
+          if (userRole.toLowerCase() == 'customer') ...[
+            GButton(icon: Icons.favorite, text: "Wishlist"),
+            GButton(icon: Icons.shopping_bag, text: "Cart"),
+          ],
+          if (userRole.toLowerCase() == 'customer') ...[
+            GButton(
+              icon: Icons.production_quantity_limits,
+              text: "My Products",
+            ),
+          ],
         ],
       ),
     );

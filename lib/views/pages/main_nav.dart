@@ -51,24 +51,41 @@ class _MainNavScreenState extends State<MainNavScreen> {
   }
 
   Widget _buildPage(int i) {
-    switch (i) {
-      case 0:
-        return HomeScreen(onGoToTab: _navigate);
-      case 1:
-        return const ProductsScreen();
-      case 2:
-        return const WishlistScreen();
-      case 3:
-        return const CartScreen();
-      case 4:
-        return const MyProducts();
-      default:
-        return const SizedBox.shrink();
+    final r = (context.read<AuthProvider>().role ?? '').toLowerCase();
+    if (r == 'seller') {
+      switch (i) {
+        case 0:
+          return HomeScreen(onGoToTab: _navigate);
+        case 1:
+          return const ProductsScreen();
+        case 2:
+          return const MyProducts();
+        default:
+          return const SizedBox.shrink();
+      }
+    } else {
+      // customer
+      switch (i) {
+        case 0:
+          return HomeScreen(onGoToTab: _navigate);
+        case 1:
+          return const ProductsScreen();
+        case 2:
+          return const WishlistScreen();
+        case 3:
+          return const CartScreen();
+        default:
+          return const SizedBox.shrink();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final role = context.watch<AuthProvider>().role ?? '';
+    final tabsCount = (role == 'seller') ? 3 : (role == 'customer' ? 4 : 2);
+    if (_index >= tabsCount) _index = 0;
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 40,
@@ -131,7 +148,11 @@ class _MainNavScreenState extends State<MainNavScreen> {
 
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: MyNavigation(currentIndex: _index, onTap: _navigate),
+        child: MyNavigation(
+          currentIndex: _index,
+          onTap: _navigate,
+          userRole: role,
+        ),
       ),
     );
   }
