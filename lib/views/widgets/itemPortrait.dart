@@ -8,6 +8,7 @@ class ItemPortraitView extends StatelessWidget {
   final Product game;
   final int amount;
   final bool isWishlist;
+  final void Function(int delta)? onUpdate;
   final VoidCallback onRemove;
   final VoidCallback? onCart;
   const ItemPortraitView({
@@ -16,8 +17,32 @@ class ItemPortraitView extends StatelessWidget {
     required this.amount,
     required this.isWishlist,
     required this.onRemove,
+    this.onUpdate,
     this.onCart,
   });
+
+  Widget updateWishlistAmnt(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove),
+            onPressed: () => onUpdate!(-1),
+          ),
+          Text('$amount', style: Theme.of(context).textTheme.titleMedium),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => onUpdate!(1),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

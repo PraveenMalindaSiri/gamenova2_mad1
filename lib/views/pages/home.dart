@@ -58,6 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
         message: e.toString(),
         type: NoticeType.error,
       );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

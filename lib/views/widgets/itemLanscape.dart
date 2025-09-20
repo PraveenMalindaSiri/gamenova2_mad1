@@ -9,6 +9,7 @@ class ItemLanscapeView extends StatelessWidget {
   final int amount;
   final bool isWishlist;
   final VoidCallback onRemove;
+  final void Function(int delta)? onUpdate;
   final VoidCallback? onCart;
   const ItemLanscapeView({
     super.key,
@@ -16,8 +17,32 @@ class ItemLanscapeView extends StatelessWidget {
     required this.amount,
     required this.isWishlist,
     required this.onRemove,
+    this.onUpdate,
     this.onCart,
   });
+
+  Widget updateWishlistAmnt(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.remove),
+            onPressed: () => onUpdate!(-1),
+          ),
+          Text('$amount', style: Theme.of(context).textTheme.titleMedium),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => onUpdate!(1),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,12 +107,14 @@ class ItemLanscapeView extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  Text(
-                    "x $amount",
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      fontWeight: FontWeight.bold,
+                  if (game.type != 'digital') updateWishlistAmnt(context),
+                  if (game.type == 'digital')
+                    Text(
+                      "x $amount",
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
                   Text(
                     "Rs.${game.price * amount}",
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(

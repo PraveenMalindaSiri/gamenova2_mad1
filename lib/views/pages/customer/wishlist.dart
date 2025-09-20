@@ -93,6 +93,48 @@ class _WishlistScreenState extends State<WishlistScreen> {
     }
   }
 
+  Future<void> updateWishlistAmount(WishlistItem item, int delta) async {
+    setState(() => _isLoading = true);
+    final newQty = (item.quantity + delta);
+    try {
+      final auth = context.read<AuthProvider>();
+      final token = auth.token ?? '';
+
+      await WishlistService.updateWishlistItem(
+        token: token,
+        id: item.id,
+        quantity: newQty,
+      );
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Updated Wishlist',
+        message: "'${item.product.title}'updated Wishlist amount.",
+        type: NoticeType.success,
+      );
+      if (mounted) setState(() => _isLoading = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Updating Wishlist failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
   Future<void> remove(WishlistItem item) async {
     try {
       final auth = context.read<AuthProvider>();
@@ -154,6 +196,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         isWishlist: true,
                         onCart: () => addToCart(item),
                         onRemove: () => remove(item),
+                        onUpdate: (delta) => updateWishlistAmount(item, delta),
                       );
                     } else {
                       return ItemPortraitView(

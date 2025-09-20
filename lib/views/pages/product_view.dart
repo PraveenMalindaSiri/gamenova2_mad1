@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_field
 
 import 'dart:async';
 
@@ -82,48 +82,6 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
       await showNoticeDialog(
         context: context,
         title: 'Adding to Wishlist failed',
-        message: e.toString(),
-        type: NoticeType.error,
-      );
-    }
-  }
-
-  Future<void> updateWishlistAmount(int amount, Product game) async {
-    setState(() => _isLoading = true);
-
-    try {
-      final auth = context.read<AuthProvider>();
-      final token = auth.token ?? '';
-
-      await WishlistService.updateWishlistItem(
-        token: token,
-        id: game.id,
-        quantity: amount,
-      );
-
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Updated Wishlist',
-        message: "'${game.title}'updated Wishlist amount.",
-        type: NoticeType.success,
-      );
-      if (mounted) setState(() => _isLoading = false);
-    } on TimeoutException {
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Network timeout',
-        message: 'Please check your connection and try again.',
-        type: NoticeType.warning,
-      );
-    } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Updating Wishlist failed',
         message: e.toString(),
         type: NoticeType.error,
       );
