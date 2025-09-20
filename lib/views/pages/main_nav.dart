@@ -6,6 +6,7 @@ import 'package:gamenova2_mad1/views/pages/customer/cart.dart';
 import 'package:gamenova2_mad1/views/pages/customer/wishlist.dart';
 import 'package:gamenova2_mad1/views/pages/home.dart';
 import 'package:gamenova2_mad1/views/pages/products.dart';
+import 'package:gamenova2_mad1/views/pages/seller/myproducts.dart';
 import 'package:gamenova2_mad1/views/widgets/navbar.dart';
 import 'package:provider/provider.dart';
 
@@ -59,6 +60,8 @@ class _MainNavScreenState extends State<MainNavScreen> {
         return const WishlistScreen();
       case 3:
         return const CartScreen();
+      case 4:
+        return const MyProducts();
       default:
         return const SizedBox.shrink();
     }
@@ -85,14 +88,6 @@ class _MainNavScreenState extends State<MainNavScreen> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: _drawerItem("Games", 1),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: _drawerItem("Wishlist", 2),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: _drawerItem("Cart", 3),
               ),
               TextButton(
                 onPressed: () async {

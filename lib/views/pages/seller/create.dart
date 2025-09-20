@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
-import 'package:gamenova2_mad1/core/service/product_service.dart';
+import 'package:gamenova2_mad1/core/service/seller_service.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/text_field.dart';
 
@@ -96,7 +96,7 @@ class _ManageGameState extends State<ManageGame> {
       'released_date': releasedController.text,
     };
     try {
-      await ProductService.createProduct(data: data, token: widget.token);
+      await SellerService.createProduct(data: data, token: widget.token);
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -148,7 +148,7 @@ class _ManageGameState extends State<ManageGame> {
     };
 
     try {
-      await ProductService.updateProduct(
+      await SellerService.updateProduct(
         data: data,
         id: widget.game!.id,
         token: widget.token,
@@ -205,7 +205,11 @@ class _ManageGameState extends State<ManageGame> {
     setState(() => _isSaving = true);
 
     try {
-      await ProductService.deleteProduct();
+      await SellerService.deleteProduct(
+        id: widget.game!.id,
+        token: widget.token,
+      );
+
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
