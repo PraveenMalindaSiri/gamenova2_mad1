@@ -44,7 +44,7 @@ class MyNavigation extends StatelessWidget {
             GButton(icon: Icons.favorite, text: "Wishlist"),
             GButton(icon: Icons.shopping_bag, text: "Cart"),
           ],
-          if (userRole.toLowerCase() == 'customer') ...[
+          if (userRole.toLowerCase() == 'seller') ...[
             GButton(
               icon: Icons.production_quantity_limits,
               text: "My Products",

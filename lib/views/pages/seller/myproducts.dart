@@ -26,12 +26,12 @@ class _MyProductsState extends State<MyProducts> {
     try {
       final auth = context.read<AuthProvider>();
       final token = auth.token ?? '';
+      sellertoken = token;
 
       final list = await SellerService.getSellerGames(token);
 
       setState(() {
         games = list;
-        sellertoken = token;
       });
 
       if (mounted) setState(() => _isLoading = false);
@@ -53,12 +53,34 @@ class _MyProductsState extends State<MyProducts> {
         message: e.toString(),
         type: NoticeType.error,
       );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadSellerProducts();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return ManageGame(token: sellertoken);
+              },
+            ),
+          );
+        },
+        label: Text("Add"),
+        icon: Icon(Icons.add),
+      ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : games.isEmpty
@@ -66,7 +88,6 @@ class _MyProductsState extends State<MyProducts> {
           : ListView.separated(
               separatorBuilder: (_, __) =>
                   const Padding(padding: EdgeInsets.all(5)),
-              scrollDirection: Axis.horizontal,
               itemCount: games.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
