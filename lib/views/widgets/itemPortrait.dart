@@ -104,12 +104,14 @@ class ItemPortraitView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(
-                  "x $amount",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.bold),
-                ),
+                if (game.type != 'digital') updateWishlistAmnt(context),
+                if (game.type == 'digital')
+                  Text(
+                    "x $amount",
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 Text(
                   "Rs.${game.price * amount}",
                   style: Theme.of(

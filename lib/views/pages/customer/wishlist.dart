@@ -96,6 +96,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
   Future<void> updateWishlistAmount(WishlistItem item, int delta) async {
     setState(() => _isLoading = true);
     final newQty = (item.quantity + delta);
+
     try {
       final auth = context.read<AuthProvider>();
       final token = auth.token ?? '';
@@ -113,6 +114,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         message: "'${item.product.title}'updated Wishlist amount.",
         type: NoticeType.success,
       );
+      loadWishlist();
       if (mounted) setState(() => _isLoading = false);
     } on TimeoutException {
       if (!mounted) return;
