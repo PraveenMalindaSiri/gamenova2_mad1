@@ -84,6 +84,28 @@ class ProductService {
     }
   }
 
+  static Future<Product> getProductDetails(String id) async {
+    try {
+      final url = Uri.http(basePath, "$productsPath/$id");
+
+      final response = await http
+          .get(url, headers: {'Content-Type': 'application/json'})
+          .timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final map = decoded['data'] as Map<String, dynamic>;
+        return Product.fromJson(map);
+      } else {
+        throw Exception('Failed to load the product: ${response.statusCode}');
+      }
+    } on TimeoutException {
+      throw Exception('Connection timed out. Please try again.');
+    } catch (e) {
+      throw Exception('Product Details loading failed: $e');
+    }
+  }
+
   static Future<void> createProduct({
     required Map<String, dynamic> data,
     required String token,

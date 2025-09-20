@@ -5,7 +5,7 @@ class CartItem {
   final int userId;
   final int productId;
   final int quantity;
-  final Product product;
+  final Product? product;
   final String? createdAt;
   final String? updatedAt;
 
@@ -14,7 +14,7 @@ class CartItem {
     required this.userId,
     required this.productId,
     required this.quantity,
-    required this.product,
+    this.product,
     this.createdAt,
     this.updatedAt,
   });

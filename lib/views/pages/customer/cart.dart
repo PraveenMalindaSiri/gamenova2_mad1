@@ -30,63 +30,46 @@ class _CartScreenState extends State<CartScreen> {
     setState(() => _isLoading = true);
     try {
       final auth = context.read<AuthProvider>();
-      final token = auth.token ?? '';
+      final userId = auth.user!.id;
 
-      final list = await CartService.getCart(token);
+      final items = await CartService.getCart(userId);
+      if (!mounted) return;
 
       setState(() {
-        _cart = list;
+        _cart = items;
         _isLoading = false;
       });
       calcCartTotal();
-      if (mounted) setState(() => _isLoading = false);
-    } on TimeoutException {
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Network timeout',
-        message: 'Please check your connection and try again.',
-        type: NoticeType.warning,
-      );
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-
       if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Loading Cart failed',
-        message: e.toString(),
-        type: NoticeType.error,
-      );
+      setState(() {
+        _isLoading = false;
+        error = 'Failed to load cart: $e';
+      });
     }
   }
 
   Future<void> remove(CartItem item) async {
     try {
-      // await CartService.deleteCartItem(id: id);
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Removed',
-        message: "'${item.product.title}' removed from Cart.",
-        type: NoticeType.success,
-      );
-      loadCart();
-    } on TimeoutException {
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Network timeout',
-        message: 'Please check your connection and try again.',
-        type: NoticeType.warning,
-      );
-    } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      final auth = context.read<AuthProvider>();
+      final userId = auth.user!.id;
+
+      await CartService.removeItem(userId, item.productId);
 
       if (!mounted) return;
-      await showNoticeDialog(
+      setState(() {
+        _cart.removeWhere((c) => c.productId == item.productId);
+      });
+      calcCartTotal();
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Removed from cart')));
+    } catch (e) {
+      if (!mounted) return;
+      showNoticeDialog(
         context: context,
-        title: 'Deleteing item failed',
+        title: 'Remove failed',
         message: e.toString(),
         type: NoticeType.error,
       );
@@ -96,7 +79,7 @@ class _CartScreenState extends State<CartScreen> {
   void calcCartTotal() {
     double sum = 0;
     for (final item in _cart) {
-      final price = double.tryParse(item.product.price.toString()) ?? 0;
+      final price = double.tryParse(item.product!.price.toString()) ?? 0;
       sum += price * item.quantity;
     }
     setState(() => totalPrice = sum);
@@ -179,14 +162,14 @@ class _CartScreenState extends State<CartScreen> {
                           if (constraints.maxWidth > 800) {
                             return ItemLanscapeView(
                               amount: item.quantity,
-                              game: item.product,
+                              game: item.product!,
                               isWishlist: false,
                               onRemove: () => remove(item),
                             );
                           } else {
                             return ItemPortraitView(
                               amount: item.quantity,
-                              game: item.product,
+                              game: item.product!,
                               isWishlist: false,
                               onRemove: () => remove(item),
                             );

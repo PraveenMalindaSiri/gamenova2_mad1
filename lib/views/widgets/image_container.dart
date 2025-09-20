@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 Widget productImage(String pathOrUrl, double height) {
-  final isUrl = pathOrUrl.startsWith(
-    'http',
-  ); // accept with full or half url of an img
+  // final isUrl = pathOrUrl.startsWith(
+  //   'http',
+  // ); // accept with full or half url of an img
   final src = '';
   // final src = isUrl
   //     ? pathOrUrl

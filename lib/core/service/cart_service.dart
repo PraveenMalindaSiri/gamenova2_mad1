@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gamenova2_mad1/core/models/cart.dart';
+import 'package:gamenova2_mad1/core/models/cart_db.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
@@ -8,36 +9,12 @@ class CartService {
   static const String base = "127.0.0.1:8000";
   static const String cartPath = "/api/cart";
 
-  static Future<List<CartItem>> getCart(String token) async {
-    try {
-      final url = Uri.http(base, cartPath);
+  static Future<List<CartItem>> getCart(int userId) {
+    return CartDB().getCart(userId);
+  }
 
-      final response = await http
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 30));
-
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        final items = (decoded['data'] as List<dynamic>);
-        final list = items
-            .map((j) => CartItem.fromJson(j as Map<String, dynamic>))
-            .toList();
-        // print(list);
-        return list;
-      } else {
-        throw Exception('Failed to load Cart: ${response.statusCode}');
-      }
-    } on TimeoutException {
-      throw Exception('Connection timed out. Please try again.');
-    } catch (e) {
-      throw Exception('Loading Cart failed: $e');
-    }
+  static Future<void> removeItem(int userId, int productId) {
+    return CartDB().removeItem(userId: userId, productId: productId);
   }
 
   static Future<CartItem> addToCart({
@@ -72,39 +49,6 @@ class CartService {
       throw Exception('Connection timed out. Please try again.');
     } catch (e) {
       throw Exception('Cart add failed: $e');
-    }
-  }
-
-  static Future<CartItem> updateCartItem({
-    required String token,
-    required int id,
-    required int quantity,
-  }) async {
-    try {
-      final url = Uri.parse('$base$cartPath/$id');
-      final res = await http
-          .put(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-            body: jsonEncode({'quantity': quantity}),
-          )
-          .timeout(const Duration(seconds: 30));
-      if (res.statusCode == 200) {
-        final data =
-            (jsonDecode(res.body) as Map<String, dynamic>)['data']
-                as Map<String, dynamic>;
-        return CartItem.fromJson(data);
-      }
-      final body = jsonDecode(res.body);
-      throw Exception(body['message'] ?? 'Failed to update Cart item');
-    } on TimeoutException {
-      throw Exception('Connection timed out. Please try again.');
-    } catch (e) {
-      throw Exception('Cart update failed: $e');
     }
   }
 
