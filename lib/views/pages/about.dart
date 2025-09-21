@@ -77,7 +77,6 @@ class _AboutState extends State<About> {
                             const SizedBox(height: 10),
                         itemCount: welcomeData!.details.length,
                       ),
-                      SizedBox(height: 10),
 
                       Text(
                         welcomeData!.platforms,
@@ -164,7 +163,7 @@ class _AboutState extends State<About> {
                           itemCount: welcomeData!.features.length,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 50),
                     ],
                   ),
                 ),

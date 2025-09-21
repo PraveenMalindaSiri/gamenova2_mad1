@@ -9,9 +9,12 @@ class UserService {
   // static const String registerPath =
   //     "https://gamenova.duckdns.org/api/register";
 
-  static const String loginPath = "http://127.0.0.1:8000/api/login";
-  static const String registerPath = "http://127.0.0.1:8000/api/register";
-  static const String logoutPath = "http://127.0.0.1:8000/api/logout";
+  // static const String loginPath = "http://127.0.0.1:8000/api/login";
+  static const String loginPath = "http://192.168.1.100:8000/api/login";
+  // static const String registerPath = "http://127.0.0.1:8000/api/register";
+  static const String registerPath = "http://192.168.1.100:8000/api/register";
+  // static const String logoutPath = "http://127.0.0.1:8000/api/logout";
+  static const String logoutPath = "http://192.168.1.100:8000/api/logout";
 
   static Future<User> login(String email, String password) async {
     try {

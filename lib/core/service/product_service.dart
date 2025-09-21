@@ -9,7 +9,8 @@ class ProductService {
   // static const String registerPath =
   //     "https://gamenova.duckdns.org/api/register";
 
-  static const String basePath = "127.0.0.1:8000";
+  // static const String basePath = "127.0.0.1:8000";
+  static const String basePath = "192.168.1.100:8000";
   static const String homePath = "/api/home";
   static const String productsPath = "/api/products";
 
@@ -31,6 +32,10 @@ class ProductService {
         final featured = (json['featured'] as List)
             .map((e) => Product.fromJson(e))
             .toList();
+
+        print("===========================================");
+        print(latest);
+        print(featured);
 
         return {'latest': latest, 'featured': featured};
       } else {

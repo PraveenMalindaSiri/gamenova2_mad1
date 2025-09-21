@@ -163,7 +163,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
       body: _buildPage(_index),
 
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(bottom: 45),
         child: MyNavigation(
           currentIndex: _index,
           onTap: _navigate,

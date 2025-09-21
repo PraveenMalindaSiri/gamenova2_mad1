@@ -49,7 +49,7 @@ class Product {
       price: (json['price'] as num).toDouble(),
       company: json['company'] as String,
       releasedAt: json['released_date'],
-      size: json['size'] as double,
+      size: (json['size'] as num).toDouble(),
       duration: json['duration'] as String,
       ageRating: json['age_rating'] as int,
       description: json['description'] as String,

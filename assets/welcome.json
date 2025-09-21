@@ -1,19 +1,22 @@
 {
     "title": "Welcome to GameNova",
     "subtitle": "A marketplace to buy and sell physical and digital games.",
-    "description": "Our community is for gamers who want to explore the wide gaming world.",
+    "description": "Our community is for gamers who want to explore the wide gaming world, discover hidden gems, and trade confidently with verified sellers. From day-one AAA launches to beloved indies, GameNova brings everything into one clean experience with powerful filters, rich product pages, and community feedback so you can buy smarter and play sooner.",
     "details": [
         "At GameNova, gamers can buy their favorite games at a great price.",
         "Sellers can sell their games to test their skills and strength in the industry.",
-        "We believe having a platform to connect gamers and game sellers can help the gaming industry grow quickly."
+        "We believe having a platform to connect gamers and game sellers can help the gaming industry grow quickly.",
+        "A clean checkout supports cards, wallets, and local methods, with tax breakdowns and instant receipts."
     ],
     "platforms": "We support physical and digital copies of any game for all major platforms like PC, Xbox, and PlayStation.",
-    "closing": "Thank you for being a part of our family.",
+    "closing": "Thank you for being a part of our family. Your feedback shapes our roadmap—tell us what to build next and help level up the marketplace for everyone.",
     "tagline": "Level Up with us - one game at a time.",
     "features": [
         "Secure payments",
         "Seller dashboards",
         "Digital download codes",
+        "Two-factor authentication (2FA)",
+        "Order tracking for physical items",
         "Customer reviews"
     ],
     "partners": [
@@ -21,10 +24,15 @@
         "Ubisoft",
         "Square Enix",
         "Bandai Namco",
+        "Nintendo",
+        "SEGA",
+        "2K",
+        "Rockstar Games",
         "Activision",
         "CDPR",
         "bethesda",
         "XBOX",
-        "PS"
+        "PS",
+        "miHoYo"
     ]
 }

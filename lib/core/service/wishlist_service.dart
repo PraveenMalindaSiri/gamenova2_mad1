@@ -5,7 +5,9 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class WishlistService {
-  static const String base = "127.0.0.1:8000";
+  // static const String base = "127.0.0.1:8000";
+  static const String base = "192.168.1.100:8000";
+
   static const String wishlistPath = "/api/wishlist";
 
   static Future<List<WishlistItem>> getWishlist(String token) async {

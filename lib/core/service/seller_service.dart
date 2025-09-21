@@ -7,7 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class SellerService {
-  static const String basePath = "127.0.0.1:8000";
+  // static const String basePath = "127.0.0.1:8000";
+  static const String basePath = "192.168.1.100:8000";
   static const String productsPath = "/api/myproducts";
 
   static Future<List<Product>> getSellerGames(String token) async {
