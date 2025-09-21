@@ -7,6 +7,7 @@ import 'package:gamenova2_mad1/core/utility/colors.dart';
 import 'package:gamenova2_mad1/views/pages/product_view.dart';
 import 'package:gamenova2_mad1/views/widgets/card.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:shake/shake.dart';
 
 class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
@@ -16,6 +17,7 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
+  late final ShakeDetector _detector;
   List<Product> _rpgGames = [];
   List<Product> _shooterGames = [];
   List<Product> _racingGames = [];
@@ -162,7 +164,20 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   void initState() {
     super.initState();
+    _detector = ShakeDetector.autoStart(
+      onPhoneShake: (event) {
+        getSections();
+      },
+      shakeThresholdGravity: 2.7,
+      shakeCountResetTime: 1000,
+    );
     getSections();
+  }
+
+  @override
+  void dispose() {
+    _detector.stopListening();
+    super.dispose();
   }
 
   Widget _buildGenreSection(String title, List<Product> games) {

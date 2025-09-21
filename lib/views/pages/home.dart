@@ -12,6 +12,7 @@ import 'package:gamenova2_mad1/views/pages/seller/create.dart';
 import 'package:gamenova2_mad1/views/widgets/card.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:provider/provider.dart';
+import 'package:shake/shake.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(int)? onGoToTab;
@@ -22,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final ShakeDetector _detector;
   List<Product> _latestGames = [];
   List<Product> _featuredGames = [];
   bool _isLoading = true;
@@ -83,6 +85,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _detector = ShakeDetector.autoStart(
+      onPhoneShake: (event) {
+        getSections();
+      },
+      shakeThresholdGravity: 2.7,
+      shakeCountResetTime: 1000,
+    );
     getSections();
   }
 
@@ -272,6 +281,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _detector.stopListening();
+    super.dispose();
   }
 
   @override
