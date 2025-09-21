@@ -1,12 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/service/payment_service.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 
 class PaymentScreen extends StatefulWidget {
   final String token;
@@ -63,75 +64,36 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  Future<void> getCurrentAddress() async {
-    try {
-      setState(() => _isSaving = true);
+  Future<void> fillNearestName() async {
+    final pos = await Geolocator.getCurrentPosition();
 
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() => _isSaving = false);
-        await showNoticeDialog(
-          context: context,
-          title: 'Location disabled',
-          message: 'Please enable Location Services (GPS) and try again.',
-          type: NoticeType.warning,
-        );
-        return;
-      }
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.deniedForever ||
-          permission == LocationPermission.denied) {
-        setState(() => _isSaving = false);
-        return;
-      }
+    final uri = Uri.https('nominatim.openstreetmap.org', '/reverse', {
+      'lat': pos.latitude.toString(),
+      'lon': pos.longitude.toString(),
+      'format': 'json',
+      'zoom': '18',
+      'namedetails': '1',
+    });
 
-      final pos = await Geolocator.getCurrentPosition();
+    final res = await http
+        .get(
+          uri,
+          headers: {'User-Agent': 'Traveloute/1.0 (contact@example.com)'},
+        )
+        .timeout(const Duration(seconds: 12));
 
-      final placemarks = await placemarkFromCoordinates(
-        pos.latitude,
-        pos.longitude,
-      );
+    if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
 
-      if (placemarks.isEmpty) {
-        setState(() => _isSaving = false);
-        await showNoticeDialog(
-          context: context,
-          title: 'Not found',
-          message: 'Could not resolve your address. Please type it manually.',
-          type: NoticeType.warning,
-        );
-        return;
-      }
+    // prefer namedetails.name, fall back to 'display_name'
+    final namedetails = json['namedetails'] as Map<String, dynamic>?;
+    final name =
+        namedetails?['name'] as String? ??
+        (json['address']?['amenity'] as String?) ??
+        (json['display_name'] as String?);
 
-      final p = placemarks.first;
-
-      final line =
-          [
-                p.name,
-                p.subLocality,
-                p.locality,
-                p.administrativeArea,
-                p.postalCode,
-                p.country,
-              ]
-              .whereType<String>()
-              .map((s) => s.trim())
-              .where((s) => s.isNotEmpty)
-              .join(', ');
-
-      Address.text = line;
-    } catch (e) {
-      await showNoticeDialog(
-        context: context,
-        title: 'Location error',
-        message: e.toString(),
-        type: NoticeType.error,
-      );
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
+    if (name != null && name.trim().isNotEmpty) {
+      Address.text = name;
     }
   }
 
@@ -322,7 +284,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
-    getCurrentAddress();
+    fillNearestName();
   }
 
   @override
