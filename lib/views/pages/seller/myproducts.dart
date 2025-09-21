@@ -90,17 +90,27 @@ class _MyProductsState extends State<MyProducts> {
                   const Padding(padding: EdgeInsets.all(5)),
               itemCount: games.length,
               itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: GameCard(game: games[index]),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ManageGame(game: games[index], token: sellertoken),
+                return Center(
+                  child: GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        height: 350,
+                        child: GameCard(game: games[index]),
                       ),
-                    );
-                  },
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ManageGame(
+                            game: games[index],
+                            token: sellertoken,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),

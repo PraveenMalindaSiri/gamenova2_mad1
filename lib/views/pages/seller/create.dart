@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/seller_service.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/text_field.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ManageGame extends StatefulWidget {
   final Product? game;
@@ -34,9 +38,12 @@ class _ManageGameState extends State<ManageGame> {
   String? _selectedPlatform;
   String? _selectedGenre;
 
-  // released and genre
+  final ImagePicker _picker = ImagePicker();
+  XFile? _file;
+  Uint8List? _photoBytes;
 
   bool _isSaving = false;
+  String seller = '';
 
   @override
   void initState() {
@@ -62,51 +69,89 @@ class _ManageGameState extends State<ManageGame> {
     releasedController = TextEditingController(
       text: widget.game?.releasedAt ?? '',
     );
+    loadUser();
+  }
+
+  Future<void> pickFromGallery() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    setState(() {
+      _file = picked;
+      _photoBytes = bytes;
+    });
+  }
+
+  Future<void> pickFromCamera() async {
+    final picked = await _picker.pickImage(source: ImageSource.camera);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    setState(() {
+      _file = picked;
+      _photoBytes = bytes;
+    });
   }
 
   Future<void> create() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
-    if (_selectedGenre!.isEmpty ||
-        _selectedType!.isEmpty ||
-        _selectedPlatform!.isEmpty) {
+    if ((_selectedGenre == null || _selectedGenre!.isEmpty) ||
+        (_selectedType == null || _selectedType!.isEmpty) ||
+        (_selectedPlatform == null || _selectedPlatform!.isEmpty)) {
       await showNoticeDialog(
         context: context,
         title: 'Missing Inputs',
         message: 'Please fill all the details.',
         type: NoticeType.error,
       );
+      setState(() => _isSaving = false);
       return;
     }
 
-    final price = double.tryParse(priceController.text.trim()) ?? 0;
-    final age = int.tryParse(ageRatingController.text.trim()) ?? 0;
+    if (_file == null) {
+      await showNoticeDialog(
+        context: context,
+        title: 'Product photo required',
+        message: 'Please select an image for this product.',
+        type: NoticeType.error,
+      );
+      setState(() => _isSaving = false);
+      return;
+    }
+
     final data = {
       'title': titleController.text.trim(),
       'description': descriptionController.text.trim(),
       'duration': durationController.text.trim(),
       'size': sizeController.text.trim(),
-      'age_rating': age,
+      'age_rating': ageRatingController.text.trim(),
       'company': companyController.text.trim(),
-      'price': price,
+      'price': priceController.text.trim(),
       'type': (_selectedType ?? '').toLowerCase(),
       'platform': _selectedPlatform,
       'genre': _selectedGenre,
       'released_date': releasedController.text,
     };
     try {
-      await SellerService.createProduct(data: data, token: widget.token);
+      await SellerService.createProduct(
+        data: data,
+        token: widget.token,
+        photo: _file!,
+      );
       if (!mounted) return;
+      setState(() => _isSaving = false);
       await showNoticeDialog(
         context: context,
         title: 'Created',
         message: 'Game created successfully.',
         type: NoticeType.success,
       );
+      if (!mounted) return;
       Navigator.pop(context, true);
     } on TimeoutException {
       if (!mounted) return;
+      setState(() => _isSaving = false);
       await showNoticeDialog(
         context: context,
         title: 'Network timeout',
@@ -154,6 +199,7 @@ class _ManageGameState extends State<ManageGame> {
         token: widget.token,
       );
       if (!mounted) return;
+      setState(() => _isSaving = false);
       await showNoticeDialog(
         context: context,
         title: 'Updated',
@@ -217,6 +263,8 @@ class _ManageGameState extends State<ManageGame> {
         message: 'Game Deleted successfully.',
         type: NoticeType.success,
       );
+      if (!mounted) return;
+      setState(() => _isSaving = false);
     } on TimeoutException {
       if (!mounted) return;
       await showNoticeDialog(
@@ -236,6 +284,70 @@ class _ManageGameState extends State<ManageGame> {
         type: NoticeType.error,
       );
     }
+  }
+
+  Future<void> restore() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Restore Game?'),
+        content: Text('This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Restore'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      await SellerService.restoreProduct(
+        id: widget.game!.id,
+        token: widget.token,
+      );
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Restore',
+        message: 'Game Restore successfully.',
+        type: NoticeType.success,
+      );
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isSaving = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Restoring game failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
+
+  Future<void> loadUser() async {
+    final auth = context.read<AuthProvider>();
+    final id = auth.userId ?? '';
+    seller = id;
   }
 
   Widget readOnlyField(String label, String value) {
@@ -384,6 +496,60 @@ class _ManageGameState extends State<ManageGame> {
                               : Text("Update game: ${widget.game!.title}"),
                           Padding(padding: EdgeInsets.only(bottom: 10)),
 
+                          if (widget.game == null) ...[
+                            // img
+                            const SizedBox(height: 8),
+                            Container(
+                              width: 100,
+                              height: 100,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                border: Border.all(
+                                  width: 1,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              child: _photoBytes != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.memory(
+                                        _photoBytes!,
+                                        width: 160,
+                                        height: 160,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Text(
+                                      'No image selected',
+                                      style: TextStyle(fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                    ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // img picker
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: pickFromGallery,
+                                    icon: const Icon(Icons.photo_library),
+                                    label: const Text('Gallery'),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  ElevatedButton.icon(
+                                    onPressed: pickFromCamera,
+                                    icon: const Icon(Icons.photo_camera),
+                                    label: const Text('Camera'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+
                           MyTextField(
                             context,
                             titleController,
@@ -485,19 +651,19 @@ class _ManageGameState extends State<ManageGame> {
                                   context,
                                   MediaQuery.of(context).size.width * 0.9,
                                 ),
-                                SizedBox(height: 20),
+                                SizedBox(height: 10),
 
                                 buildPlatform(
                                   context,
                                   MediaQuery.of(context).size.width * 0.9,
                                 ),
-                                SizedBox(height: 20),
+                                SizedBox(height: 10),
 
                                 buildTypes(
                                   context,
                                   MediaQuery.of(context).size.width * 0.9,
                                 ),
-                                SizedBox(height: 20),
+                                SizedBox(height: 10),
                               ],
                             );
                           }
@@ -531,7 +697,7 @@ class _ManageGameState extends State<ManageGame> {
                                 ),
                               )
                             : widget.game == null
-                            ? Icon(Icons.add)
+                            ? Icon(Icons.save_alt)
                             : Icon(Icons.edit),
                         label: const Text(
                           'SAVE',
@@ -549,11 +715,13 @@ class _ManageGameState extends State<ManageGame> {
                     SizedBox(height: 20),
 
                     if (widget.game != null &&
-                        widget.game!.sellerId.toString() == '')
+                        widget.game!.sellerId.toString() == seller)
                       SizedBox(
                         width: MediaQuery.sizeOf(context).width * 0.5,
                         child: ElevatedButton.icon(
-                          onPressed: _isSaving ? null : delete,
+                          onPressed: _isSaving
+                              ? null
+                              : (widget.game!.isTrashed ? restore : delete),
                           icon: _isSaving
                               ? const SizedBox(
                                   width: 22,
@@ -562,10 +730,14 @@ class _ManageGameState extends State<ManageGame> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : const Icon(Icons.delete),
-                          label: const Text(
-                            'DELETE',
-                            style: TextStyle(
+                              : Icon(
+                                  widget.game!.isTrashed
+                                      ? Icons.restore
+                                      : Icons.delete,
+                                ),
+                          label: Text(
+                            widget.game!.isTrashed ? 'RESTORE' : 'DELETE',
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
                             ),

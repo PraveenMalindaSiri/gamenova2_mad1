@@ -37,6 +37,8 @@ class Product {
     required this.featured,
   });
 
+  bool get isTrashed => deletedAt != null;
+
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] as int,
