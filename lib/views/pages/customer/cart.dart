@@ -24,28 +24,63 @@ class _CartScreenState extends State<CartScreen> {
 
   bool agreed = false;
   double totalPrice = 0;
-  String? error;
+  String token = '';
+
+  // Future<void> loadCart() async {
+  //   setState(() => _isLoading = true);
+  //   try {
+  //     final auth = context.read<AuthProvider>();
+  //     final userId = auth.user!.id;
+
+  //     final items = await CartService.getCart(userId);
+  //     if (!mounted) return;
+
+  //     setState(() {
+  //       _cart = items;
+  //       _isLoading = false;
+  //     });
+  //     calcCartTotal();
+  //   } catch (e) {
+  //     if (!mounted) return;
+  //     setState(() {
+  //       _isLoading = false;
+  //       error = 'Failed to load cart: $e';
+  //     });
+  //   }
+  // }
 
   Future<void> loadCart() async {
     setState(() => _isLoading = true);
     try {
       final auth = context.read<AuthProvider>();
-      final userId = auth.user!.id;
+      final token2 = auth.token ?? '';
+      token = token2;
 
-      final items = await CartService.getCart(userId);
-      if (!mounted) return;
+      final list = await CartService.getCartAPI(token);
 
       setState(() {
-        _cart = items;
-        _isLoading = false;
+        _cart = list;
       });
-      calcCartTotal();
+
+      if (mounted) setState(() => _isLoading = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
     } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
       if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        error = 'Failed to load cart: $e';
-      });
+      await showNoticeDialog(
+        context: context,
+        title: 'Loading Cart failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
     }
   }
 
@@ -85,24 +120,34 @@ class _CartScreenState extends State<CartScreen> {
     setState(() => totalPrice = sum);
   }
 
-  void checkout(total) {
-    setState(() {
-      if (total == 0) {
-        error = "You cannot proceed to checkout with an empty cart";
-      } else if (!agreed) {
-        error = "You must agree with the terms and conditions.";
-      } else {
-        error = null;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return PaymentScreen();
-            },
-          ),
-        );
-      }
-    });
+  void checkout(total) async {
+    // if (total == 0) {
+    //   await showNoticeDialog(
+    //     context: context,
+    //     title: 'Checkout failed',
+    //     message: "You cannot proceed to checkout with an empty cart",
+    //     type: NoticeType.error,
+    //   );
+    //   return;
+    // } else
+    if (!agreed) {
+      await showNoticeDialog(
+        context: context,
+        title: 'Checkout failed',
+        message: "You must agree with the terms and conditions.",
+        type: NoticeType.error,
+      );
+      return;
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return PaymentScreen(token: token);
+          },
+        ),
+      );
+    }
   }
 
   @override
@@ -134,11 +179,6 @@ class _CartScreenState extends State<CartScreen> {
           ],
         ),
         MyButton("CHECK OUT", () => checkout(totalPrice), Colors.black),
-        if (error != null)
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text(error!, style: TextStyle(color: Colors.red)),
-          ),
       ],
     );
   }

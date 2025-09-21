@@ -8,6 +8,7 @@ import 'dart:async';
 class CartService {
   static const String base = "127.0.0.1:8000";
   static const String cartPath = "/api/cart";
+  static const String purchasePath = "/api/cart/success";
 
   static Future<List<CartItem>> getCart(int userId) {
     return CartDB().getCart(userId);
@@ -15,6 +16,39 @@ class CartService {
 
   static Future<void> removeItem(int userId, int productId) {
     return CartDB().removeItem(userId: userId, productId: productId);
+  }
+
+  static Future<List<CartItem>> getCartAPI(String token) async {
+    try {
+      final url = Uri.http(base, cartPath);
+
+      final response = await http
+          .get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        final items = (decoded['data'] as List<dynamic>);
+        final list = items
+            .map((j) => CartItem.fromJson(j as Map<String, dynamic>))
+            .toList();
+        // print(list);
+        return list;
+      } else {
+        throw Exception('Failed to load Cart: ${response.statusCode}');
+      }
+    } on TimeoutException {
+      throw Exception('Connection timed out. Please try again.');
+    } catch (e) {
+      throw Exception('Loading Cart failed: $e');
+    }
   }
 
   static Future<CartItem> addToCart({
@@ -77,4 +111,6 @@ class CartService {
       throw Exception('Cart delete failed: $e');
     }
   }
+
+  
 }

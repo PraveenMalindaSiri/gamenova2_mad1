@@ -102,7 +102,7 @@ class ItemPortraitView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (game.type.toLowerCase() != 'digital')
+                if (game.type.toLowerCase() != 'digital' && isWishlist)
                   updateWishlistAmnt(context),
                 if (game.type.toLowerCase() == 'digital')
                   Text(

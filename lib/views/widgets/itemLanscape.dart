@@ -104,7 +104,7 @@ class ItemLanscapeView extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  if (game.type.toLowerCase() != 'digital')
+                  if (game.type.toLowerCase() != 'digital' && isWishlist)
                     updateWishlistAmnt(context),
                   if (game.type.toLowerCase() == 'digital')
                     Text(
