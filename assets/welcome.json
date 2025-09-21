@@ -1,0 +1,30 @@
+{
+    "title": "Welcome to GameNova",
+    "subtitle": "A marketplace to buy and sell physical and digital games.",
+    "description": "Our community is for gamers who want to explore the wide gaming world.",
+    "details": [
+        "At GameNova, gamers can buy their favorite games at a great price.",
+        "Sellers can sell their games to test their skills and strength in the industry.",
+        "We believe having a platform to connect gamers and game sellers can help the gaming industry grow quickly."
+    ],
+    "platforms": "We support physical and digital copies of any game for all major platforms like PC, Xbox, and PlayStation.",
+    "closing": "Thank you for being a part of our family.",
+    "tagline": "Level Up with us - one game at a time.",
+    "features": [
+        "Secure payments",
+        "Seller dashboards",
+        "Digital download codes",
+        "Customer reviews"
+    ],
+    "partners": [
+        "EA",
+        "Ubisoft",
+        "Square Enix",
+        "Bandai Namco",
+        "Activision",
+        "CDPR",
+        "bethesda",
+        "XBOX",
+        "PS"
+    ]
+}

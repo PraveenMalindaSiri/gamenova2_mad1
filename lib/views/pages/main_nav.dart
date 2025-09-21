@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/utility/colors.dart';
+import 'package:gamenova2_mad1/views/pages/about.dart';
 import 'package:gamenova2_mad1/views/pages/auth/login.dart';
 import 'package:gamenova2_mad1/views/pages/customer/cart.dart';
 import 'package:gamenova2_mad1/views/pages/customer/wishlist.dart';
@@ -105,6 +106,21 @@ class _MainNavScreenState extends State<MainNavScreen> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: _drawerItem("Games", 1),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => About()),
+                    );
+                  },
+                  child: Text(
+                    "About",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
               ),
               TextButton(
                 onPressed: () async {
