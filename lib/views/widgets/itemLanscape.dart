@@ -53,7 +53,7 @@ class ItemLanscapeView extends StatelessWidget {
       child: Align(
         alignment: Alignment.center,
         child: Container(
-          constraints: BoxConstraints(maxWidth: 500),
+          constraints: BoxConstraints(maxWidth: 600, minHeight: 250),
           decoration: BoxDecoration(
             color: isDark ? AppColors.darkGray : Colors.white,
             borderRadius: BorderRadius.circular(30),
@@ -70,7 +70,7 @@ class ItemLanscapeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(2.0),
                 child: GestureDetector(
                   onDoubleTap: () {
                     Navigator.push(
@@ -87,13 +87,14 @@ class ItemLanscapeView extends StatelessWidget {
                         border: Border.all(color: Colors.black, width: 2),
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      child: productImage(game.imageUrl, 200),
+                      child: productImage(game.imageUrl, 180),
                     ),
                   ),
                 ),
               ),
               Column(
                 children: [
+                  SizedBox(height: 10,),
                   SizedBox(
                     width: 200,
                     child: Text(
@@ -113,13 +114,14 @@ class ItemLanscapeView extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                  SizedBox(height: 10,),
                   Text(
                     "Rs.${game.price * amount}",
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  SizedBox(height: 10,),
                   MyButton(
                     "Remove",
                     onRemove,

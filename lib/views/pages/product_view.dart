@@ -7,8 +7,8 @@ import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/cart_service.dart';
 import 'package:gamenova2_mad1/core/service/wishlist_service.dart';
-import 'package:gamenova2_mad1/views/widgets/button.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:gamenova2_mad1/views/widgets/image_container.dart';
 import 'package:provider/provider.dart';
 
 class ProductViewScreen extends StatefulWidget {
@@ -24,7 +24,8 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   String? error;
   final AmountCnt = TextEditingController(text: "1");
   final formkey = GlobalKey<FormState>();
-  bool _isLoading = true;
+
+  bool _isLoading = false;
 
   Widget myIMG(String path, double width, double height) {
     return Padding(
@@ -95,6 +96,21 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     try {
       final auth = context.read<AuthProvider>();
       final uid = auth.userId;
+
+      if (game.type.toLowerCase() == 'digital') {
+        await CartService.isInUserCart(uid!, game.id);
+
+        if (!mounted) return;
+        await showNoticeDialog(
+          context: context,
+          title: 'Adding to Cart failed',
+          message: "You already have this digital item in the Cart",
+          type: NoticeType.error,
+        );
+        setState(() => _isLoading = false);
+
+        return;
+      }
 
       await CartService.addItem(uid!, game.id, amount);
 
@@ -204,6 +220,28 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     );
   }
 
+  Widget buildBtn(String name, VoidCallback func) {
+    return SizedBox(
+      width: MediaQuery.sizeOf(context).width * 0.4,
+      child: ElevatedButton.icon(
+        onPressed: _isLoading ? null : func,
+        icon: _isLoading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Icon(Icons.add_box_outlined),
+        label: Text(name, style: TextStyle(fontSize: 16)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.grey[400],
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          minimumSize: const Size.fromHeight(48),
+        ),
+      ),
+    );
+  }
+
   Widget buildPortrait() {
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary),
@@ -234,7 +272,10 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           ),
 
           // img
-          myIMG(widget.game.imageUrl, 300, 300),
+          Padding(
+            padding: const EdgeInsets.all(11.0),
+            child: productImage(widget.game.imageUrl, 300),
+          ),
           Padding(padding: EdgeInsets.only(bottom: 10)),
 
           // stickers
@@ -260,8 +301,9 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           Padding(padding: EdgeInsets.only(bottom: 10)),
 
           // description
+          SizedBox(height: 10),
           Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(10),
             child: Text(
               widget.game.description,
               style: Theme.of(
@@ -270,6 +312,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
               textAlign: TextAlign.center,
             ),
           ),
+          SizedBox(height: 10),
 
           // details
           Padding(
@@ -306,21 +349,21 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              MyButton("Add To Wishlist", () {
+              buildBtn("Add To Wishlist", () {
                 if (formkey.currentState!.validate()) {
                   final amount = int.parse(AmountCnt.text);
                   addToWishlist(amount, widget.game);
                 }
-              }, Colors.black),
-              MyButton("Add To Cart", () {
+              }),
+              buildBtn("Add To Cart", () {
                 if (formkey.currentState!.validate()) {
                   final amount = int.parse(AmountCnt.text);
                   addToCart(amount, widget.game);
                 }
-              }, Colors.black),
+              }),
             ],
           ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
+          SizedBox(height: 50),
         ],
       ),
     );
@@ -338,7 +381,8 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
             Column(
               children: [
                 // IMG
-                myIMG(widget.game.imageUrl, 250, 250),
+                productImage(widget.game.imageUrl, 220),
+                SizedBox(height: 20),
 
                 // stickers
                 SizedBox(
@@ -435,23 +479,27 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                   ),
 
                 // buttons
+                SizedBox(height: 20),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
-                  child: Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      MyButton("Add To Wishlist", () {
+                      buildBtn("Add To Wishlist", () {
                         if (formkey.currentState!.validate()) {
                           final amount = int.parse(AmountCnt.text);
                           addToWishlist(amount, widget.game);
                         }
-                      }, Colors.black),
-                      MyButton("Add To Cart", () {
+                      }),
+
+                      SizedBox(height: 20),
+
+                      buildBtn("Add To Cart", () {
                         if (formkey.currentState!.validate()) {
                           final amount = int.parse(AmountCnt.text);
                           addToCart(amount, widget.game);
                         }
-                      }, Colors.black),
+                      }),
                     ],
                   ),
                 ),
@@ -478,12 +526,12 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
               if (constraints.maxWidth < 800) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [buildPortrait()],
+                  children: [buildPortrait(), SizedBox(height: 50)],
                 );
               } else {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [buildLandscape()],
+                  children: [buildLandscape(), SizedBox(height: 50)],
                 );
               }
             },

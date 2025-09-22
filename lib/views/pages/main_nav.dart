@@ -83,6 +83,8 @@ class _MainNavScreenState extends State<MainNavScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final role = context.watch<AuthProvider>().role ?? '';
     final tabsCount = (role == 'seller') ? 3 : (role == 'customer' ? 4 : 2);
     if (_index >= tabsCount) _index = 0;
@@ -164,7 +166,9 @@ class _MainNavScreenState extends State<MainNavScreen> {
       body: _buildPage(_index),
 
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 45),
+        padding: isLandscape
+            ? EdgeInsets.symmetric(vertical: 5, horizontal: 30)
+            : EdgeInsets.only(bottom: 45),
         child: MyNavigation(
           currentIndex: _index,
           onTap: _navigate,

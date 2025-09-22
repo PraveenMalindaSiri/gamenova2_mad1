@@ -133,6 +133,17 @@ class CartDB {
     await db.delete(_table, where: 'user_id = ?', whereArgs: [userId]);
   }
 
+  Future<bool> isInCart(int userId, int productId) async {
+    final db = await database;
+    final rows = await db.query(
+      _table,
+      where: 'user_id = ? AND product_id = ?',
+      whereArgs: [userId, productId],
+      limit: 1,
+    );
+    return rows.isNotEmpty;
+  }
+
   Future<Map<String, String>> cartToMap(int userId) async {
     final List<CartItem> cart = await getCart(userId);
 

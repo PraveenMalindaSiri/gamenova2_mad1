@@ -22,6 +22,10 @@ class CartService {
     return _db.addItem(userId: userId, productId: productId, amount: amount);
   }
 
+  static Future<bool> isInUserCart(int userId, int productId) {
+    return _db.isInCart(userId, productId);
+  }
+
   static Future<void> removeItem(int userId, int productId) {
     return _db.removeItem(userId: userId, productId: productId);
   }

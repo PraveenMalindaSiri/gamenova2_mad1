@@ -51,7 +51,7 @@ Future<void> showNoticeDialog({
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white70, width: 2),
             ),
@@ -78,7 +78,9 @@ Future<void> showNoticeDialog({
                 Text(
                   message ?? 'Something went wrong',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelLarge,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge!.copyWith(color: Colors.black),
                 ),
                 if (actions != null)
                   Padding(

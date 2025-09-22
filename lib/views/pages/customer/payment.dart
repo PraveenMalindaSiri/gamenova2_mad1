@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/service/payment_service.dart';
+import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -42,7 +43,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
         message: 'Game Purchased successfully.',
         type: NoticeType.success,
       );
-      Navigator.pop(context, true);
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const MainNavScreen(selectPageIndex: 0),
+        ),
+        (route) => false,
+      );
     } on TimeoutException {
       if (!mounted) return;
       await showNoticeDialog(

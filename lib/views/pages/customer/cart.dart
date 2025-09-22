@@ -104,9 +104,13 @@ class _CartScreenState extends State<CartScreen> {
       });
       calcCartTotal();
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Removed from cart')));
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Removed',
+        message: "'${item.product!.title}' removed from cart.",
+        type: NoticeType.success,
+      );
     } catch (e) {
       if (!mounted) return;
       showNoticeDialog(

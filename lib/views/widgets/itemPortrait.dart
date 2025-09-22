@@ -67,6 +67,7 @@ class ItemPortraitView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
