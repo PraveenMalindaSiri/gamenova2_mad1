@@ -45,15 +45,15 @@ class CartDB {
     final List<CartItem> items = [];
 
     for (var r in rows) {
-      final pid = r['product_id'] as String;
+      final pid = r['product_id'] as int;
       Product product;
 
       try {
-        final p = await ProductService.getProductDetails(pid);
+        final p = await ProductService.getProductDetails(pid.toString());
         product = p;
       } catch (_) {
         product = Product(
-          id: int.tryParse(pid) ?? 0,
+          id: pid,
           title: 'Unavailable',
           genre: 'N/A',
           platform: 'N/A',
@@ -74,7 +74,7 @@ class CartDB {
         CartItem(
           id: r['cart_id'] as int,
           userId: r['user_id'] as int,
-          productId: pid as int,
+          productId: pid,
           quantity: r['quantity'] as int,
           product: product,
         ),
@@ -89,10 +89,33 @@ class CartDB {
     int amount = 1,
   }) async {
     final db = await database;
-    await db.insert(_table, {
-      'user_id': userId,
-      'product_id': productId,
-      'quantity': amount < 1 ? 1 : amount,
+    await db.transaction((txn) async {
+      final existing = await txn.query(
+        _table,
+        where: 'user_id = ? AND product_id = ?',
+        whereArgs: [userId, productId],
+        limit: 1,
+      );
+
+      final inc = amount <= 0 ? 1 : amount;
+
+      if (existing.isEmpty) {
+        await txn.insert(_table, {
+          'user_id': userId,
+          'product_id': productId,
+          'quantity': inc,
+        });
+      } else {
+        final row = existing.first;
+        final newQty = (row['quantity'] as int) + inc;
+        await txn.update(
+          _table,
+          {'quantity': newQty},
+          where: 'cart_id = ?',
+          whereArgs: [row['cart_id']],
+          conflictAlgorithm: ConflictAlgorithm.abort,
+        );
+      }
     });
   }
 
@@ -105,7 +128,7 @@ class CartDB {
     );
   }
 
-  Future<void> clearCart(String userId) async {
+  Future<void> clearCart(int userId) async {
     final db = await database;
     await db.delete(_table, where: 'user_id = ?', whereArgs: [userId]);
   }

@@ -11,12 +11,19 @@ class CartService {
   static const String cartPath = "/api/cart";
   static const String purchasePath = "/api/cart/success";
 
+  static final CartDB _db = CartDB();
+
   static Future<List<CartItem>> getCart(int userId) {
-    return CartDB().getCart(userId);
+    return _db.getCart(userId);
+  }
+
+  static Future<void> addItem(int userId, int productId, int amount) {
+    if (amount <= 0) amount = 1;
+    return _db.addItem(userId: userId, productId: productId, amount: amount);
   }
 
   static Future<void> removeItem(int userId, int productId) {
-    return CartDB().removeItem(userId: userId, productId: productId);
+    return _db.removeItem(userId: userId, productId: productId);
   }
 
   static Future<List<CartItem>> getCartAPI(String token) async {
@@ -112,6 +119,4 @@ class CartService {
       throw Exception('Cart delete failed: $e');
     }
   }
-
-  
 }

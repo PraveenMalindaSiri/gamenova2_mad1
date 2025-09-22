@@ -56,37 +56,29 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Future<void> addToCart(WishlistItem item) async {
+    setState(() => _isLoading = true);
+
     try {
       final auth = context.read<AuthProvider>();
-      final token = auth.token ?? '';
+      final uid = auth.userId;
 
-      await CartService.addToCart(
-        token: token,
-        productId: item.productId,
-        quantity: item.quantity,
-      );
+      await CartService.addItem(uid!, item.productId, item.quantity);
+
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
-        title: 'Added to cart',
-        message: "'${item.product.title}' moved to cart.",
+        title: 'Added to Cart',
+        message: "'${item.product.title}' added to Cart.",
         type: NoticeType.success,
       );
-    } on TimeoutException {
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Network timeout',
-        message: 'Please check your connection and try again.',
-        type: NoticeType.warning,
-      );
+      if (mounted) setState(() => _isLoading = false);
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
 
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
-        title: 'Loading Wishlist failed',
+        title: 'Adding to Cart failed',
         message: e.toString(),
         type: NoticeType.error,
       );

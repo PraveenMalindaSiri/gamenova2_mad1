@@ -122,6 +122,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
                   ),
                 ),
               ),
+              // logout
               TextButton(
                 onPressed: () async {
                   final auth = context.read<AuthProvider>();

@@ -347,7 +347,7 @@ class _ManageGameState extends State<ManageGame> {
   Future<void> loadUser() async {
     final auth = context.read<AuthProvider>();
     final id = auth.userId ?? '';
-    seller = id;
+    seller = id.toString();
   }
 
   Widget readOnlyField(String label, String value) {

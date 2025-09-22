@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
+import 'package:gamenova2_mad1/core/service/cart_service.dart';
 import 'package:gamenova2_mad1/core/service/wishlist_service.dart';
 import 'package:gamenova2_mad1/views/widgets/button.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
@@ -89,7 +90,33 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   }
 
   Future<void> addToCart(int amount, Product game) async {
-    //
+    setState(() => _isLoading = true);
+
+    try {
+      final auth = context.read<AuthProvider>();
+      final uid = auth.userId;
+
+      await CartService.addItem(uid!, game.id, amount);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Added to Cart',
+        message: "'${game.title}' added to Cart.",
+        type: NoticeType.success,
+      );
+      if (mounted) setState(() => _isLoading = false);
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Adding to Cart failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
   }
 
   Widget buildAmount() {

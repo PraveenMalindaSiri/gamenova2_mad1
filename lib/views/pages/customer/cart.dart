@@ -26,54 +26,21 @@ class _CartScreenState extends State<CartScreen> {
   double totalPrice = 0;
   String token = '';
 
-  // Future<void> loadCart() async {
-  //   setState(() => _isLoading = true);
-  //   try {
-  //     final auth = context.read<AuthProvider>();
-  //     final userId = auth.user!.id;
-
-  //     final items = await CartService.getCart(userId);
-  //     if (!mounted) return;
-
-  //     setState(() {
-  //       _cart = items;
-  //       _isLoading = false;
-  //     });
-  //     calcCartTotal();
-  //   } catch (e) {
-  //     if (!mounted) return;
-  //     setState(() {
-  //       _isLoading = false;
-  //       error = 'Failed to load cart: $e';
-  //     });
-  //   }
-  // }
-
   Future<void> loadCart() async {
     setState(() => _isLoading = true);
     try {
       final auth = context.read<AuthProvider>();
-      final token2 = auth.token ?? '';
-      token = token2;
+      final userId = auth.user!.id;
 
-      final list = await CartService.getCartAPI(token);
+      final items = await CartService.getCart(userId);
+      if (!mounted) return;
 
       setState(() {
-        _cart = list;
+        _cart = items;
+        _isLoading = false;
       });
-
-      if (mounted) setState(() => _isLoading = false);
-    } on TimeoutException {
-      if (!mounted) return;
-      await showNoticeDialog(
-        context: context,
-        title: 'Network timeout',
-        message: 'Please check your connection and try again.',
-        type: NoticeType.warning,
-      );
+      calcCartTotal();
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -81,8 +48,46 @@ class _CartScreenState extends State<CartScreen> {
         message: e.toString(),
         type: NoticeType.error,
       );
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
+
+  // Future<void> loadCart() async {
+  //   setState(() => _isLoading = true);
+  //   try {
+  //     final auth = context.read<AuthProvider>();
+  //     final token2 = auth.token ?? '';
+  //     token = token2;
+
+  //     final list = await CartService.getCartAPI(token);
+
+  //     setState(() {
+  //       _cart = list;
+  //     });
+
+  //     if (mounted) setState(() => _isLoading = false);
+  //   } on TimeoutException {
+  //     if (!mounted) return;
+  //     await showNoticeDialog(
+  //       context: context,
+  //       title: 'Network timeout',
+  //       message: 'Please check your connection and try again.',
+  //       type: NoticeType.warning,
+  //     );
+  //   } catch (e) {
+  //     if (mounted) setState(() => _isLoading = false);
+
+  //     if (!mounted) return;
+  //     await showNoticeDialog(
+  //       context: context,
+  //       title: 'Loading Cart failed',
+  //       message: e.toString(),
+  //       type: NoticeType.error,
+  //     );
+  //   }
+  // }
 
   Future<void> remove(CartItem item) async {
     try {
@@ -114,23 +119,22 @@ class _CartScreenState extends State<CartScreen> {
   void calcCartTotal() {
     double sum = 0;
     for (final item in _cart) {
-      final price = double.tryParse(item.product!.price.toString()) ?? 0;
+      final price = item.product?.price ?? 0;
       sum += price * item.quantity;
     }
     setState(() => totalPrice = sum);
   }
 
   void checkout(total) async {
-    // if (total == 0) {
-    //   await showNoticeDialog(
-    //     context: context,
-    //     title: 'Checkout failed',
-    //     message: "You cannot proceed to checkout with an empty cart",
-    //     type: NoticeType.error,
-    //   );
-    //   return;
-    // } else
-    if (!agreed) {
+    if (total == 0) {
+      await showNoticeDialog(
+        context: context,
+        title: 'Checkout failed',
+        message: "You cannot proceed to checkout with an empty cart",
+        type: NoticeType.error,
+      );
+      return;
+    } else if (!agreed) {
       await showNoticeDialog(
         context: context,
         title: 'Checkout failed',
