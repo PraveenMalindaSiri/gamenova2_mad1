@@ -5,7 +5,6 @@ import 'package:gamenova2_mad1/core/models/cart.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/cart_service.dart';
 import 'package:gamenova2_mad1/views/pages/customer/payment.dart';
-import 'package:gamenova2_mad1/views/widgets/button.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/itemLanscape.dart';
 import 'package:gamenova2_mad1/views/widgets/itemPortrait.dart';
@@ -21,6 +20,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   List<CartItem> _cart = [];
   bool _isLoading = true;
+  bool _isSaving = false;
 
   bool agreed = false;
   double totalPrice = 0;
@@ -31,6 +31,8 @@ class _CartScreenState extends State<CartScreen> {
     try {
       final auth = context.read<AuthProvider>();
       final userId = auth.user!.id;
+      final authToken = auth.token ?? '';
+      token = authToken;
 
       final items = await CartService.getCart(userId);
       if (!mounted) return;
@@ -125,24 +127,56 @@ class _CartScreenState extends State<CartScreen> {
     setState(() => totalPrice = sum);
   }
 
-  void checkout(total) async {
-    if (total == 0) {
-      await showNoticeDialog(
+  Future<void> checkout(double total) async {
+    try {
+      final auth = context.read<AuthProvider>();
+      final userId = auth.user!.id;
+      if (total == 0) {
+        if (!mounted) return;
+        await showNoticeDialog(
+          context: context,
+          title: 'Checkout failed',
+          message: "You cannot proceed to checkout with an empty cart",
+          type: NoticeType.error,
+        );
+        return;
+      }
+      if (!agreed) {
+        if (!mounted) return;
+        await showNoticeDialog(
+          context: context,
+          title: 'Checkout failed',
+          message: "You must agree with the terms and conditions.",
+          type: NoticeType.error,
+        );
+        return;
+      }
+
+      final confirm = await showDialog<bool>(
         context: context,
-        title: 'Checkout failed',
-        message: "You cannot proceed to checkout with an empty cart",
-        type: NoticeType.error,
+        builder: (_) => AlertDialog(
+          title: Text('Sync and proceed to Pay?'),
+          content: Text(
+            'Sync the your cart with the system to proceed payment. This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text('Sync and pay'),
+            ),
+          ],
+        ),
       );
-      return;
-    } else if (!agreed) {
-      await showNoticeDialog(
-        context: context,
-        title: 'Checkout failed',
-        message: "You must agree with the terms and conditions.",
-        type: NoticeType.error,
-      );
-      return;
-    } else {
+
+      if (confirm != true) return;
+      setState(() => _isSaving = true);
+
+      await CartService.syncCart(token, userId);
+      if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -151,6 +185,27 @@ class _CartScreenState extends State<CartScreen> {
           },
         ),
       );
+      setState(() => _isSaving = false);
+    } on TimeoutException {
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Network timeout',
+        message: 'Please check your connection and try again.',
+        type: NoticeType.warning,
+      );
+      setState(() => _isSaving = false);
+    } catch (e) {
+      if (mounted) setState(() => _isSaving = false);
+
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Syncing cart failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+      setState(() => _isSaving = false);
     }
   }
 
@@ -176,13 +231,41 @@ class _CartScreenState extends State<CartScreen> {
                     });
                   },
                 ),
-                Text("Terms and conditions"),
+                Text(
+                  "Terms and conditions",
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
             ),
-            Text("Rs.${totalPrice.toString()}"),
+            Text(
+              "Rs.${totalPrice.toString()}",
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ],
         ),
-        MyButton("CHECK OUT", () => checkout(totalPrice), Colors.black),
+
+        // button
+        SizedBox(
+          width: MediaQuery.sizeOf(context).width * 0.5,
+          child: ElevatedButton.icon(
+            onPressed: _isSaving ? null : () => checkout(totalPrice),
+            icon: _isSaving
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(Icons.next_plan_outlined),
+            label: const Text(
+              'CHECK OUT',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            ),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              minimumSize: const Size.fromHeight(48),
+            ),
+          ),
+        ),
       ],
     );
   }

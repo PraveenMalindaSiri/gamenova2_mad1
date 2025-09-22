@@ -132,4 +132,16 @@ class CartDB {
     final db = await database;
     await db.delete(_table, where: 'user_id = ?', whereArgs: [userId]);
   }
+
+  Future<Map<String, String>> cartToMap(int userId) async {
+    final List<CartItem> cart = await getCart(userId);
+
+    Map<String, String> newCart = {};
+
+    for (var element in cart) {
+      newCart[element.productId.toString()] = element.quantity.toString();
+    }
+
+    return newCart;
+  }
 }

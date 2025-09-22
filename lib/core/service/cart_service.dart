@@ -26,6 +26,37 @@ class CartService {
     return _db.removeItem(userId: userId, productId: productId);
   }
 
+  static Future<void> syncCart(String token, int userid) async {
+    try {
+      final cart = await _db.cartToMap(userid);
+
+      final url = Uri.http(base, "$cartPath/sync");
+
+      final res = await http
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(cart),
+          )
+          .timeout(const Duration(seconds: 30));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return;
+      }
+
+      final body = jsonDecode(res.body);
+      throw Exception(body['message'] ?? 'Failed to sync the cart');
+    } on TimeoutException {
+      throw Exception('Connection timed out. Please try again.');
+    } catch (e) {
+      throw Exception('Syncing failed: $e');
+    }
+  }
+
   static Future<List<CartItem>> getCartAPI(String token) async {
     try {
       final url = Uri.http(base, cartPath);
