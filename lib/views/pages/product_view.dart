@@ -98,21 +98,22 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
       final uid = auth.userId;
 
       if (game.type.toLowerCase() == 'digital') {
-        await CartService.isInUserCart(uid!, game.id);
-
-        if (!mounted) return;
-        await showNoticeDialog(
-          context: context,
-          title: 'Adding to Cart failed',
-          message: "You already have this digital item in the Cart",
-          type: NoticeType.error,
-        );
-        setState(() => _isLoading = false);
-
-        return;
+        final exists = await CartService.isInUserCart(uid!, game.id);
+        if (exists) {
+          if (!mounted) return;
+          await showNoticeDialog(
+            context: context,
+            title: 'Adding to Cart failed',
+            message: "You already have this digital item in the Cart",
+            type: NoticeType.error,
+          );
+          setState(() => _isLoading = false);
+          return;
+        }
+        await CartService.addItem(uid, game.id, amount);
+      } else {
+        await CartService.addItem(uid!, game.id, amount);
       }
-
-      await CartService.addItem(uid!, game.id, amount);
 
       if (!mounted) return;
       await showNoticeDialog(
@@ -132,6 +133,8 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
         message: e.toString(),
         type: NoticeType.error,
       );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

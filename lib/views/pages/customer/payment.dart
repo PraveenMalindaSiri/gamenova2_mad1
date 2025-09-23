@@ -5,7 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/service/payment_service.dart';
-import 'package:gamenova2_mad1/views/pages/main_nav.dart';
+import 'package:gamenova2_mad1/views/pages/customer/orderDetails.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -27,6 +27,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final formkey = GlobalKey<FormState>();
 
   bool _isSaving = false;
+  int? id;
 
   Future<void> payment() async {
     if (!formkey.currentState!.validate()) return;
@@ -34,7 +35,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       _isSaving = true;
     });
     try {
-      await PaymentService.payment(widget.token);
+      final result = await PaymentService.payment(widget.token);
+      id = result;
       if (!mounted) return;
       setState(() => _isSaving = false);
       await showNoticeDialog(
@@ -44,11 +46,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
         type: NoticeType.success,
       );
       if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
+      Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => const MainNavScreen(selectPageIndex: 0),
+          builder: (context) {
+            return OrderDetails(token: widget.token, id: id!);
+          },
         ),
-        (route) => false,
       );
     } on TimeoutException {
       if (!mounted) return;
@@ -71,7 +74,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
+  Future<void> _ensureLocationPermission() async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      throw Exception('Location services are disabled.');
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      throw Exception('Location permission denied.');
+    }
+  }
+
   Future<void> fillNearestName() async {
+    await _ensureLocationPermission();
+
     final pos = await Geolocator.getCurrentPosition();
 
     final uri = Uri.https('nominatim.openstreetmap.org', '/reverse', {
@@ -92,7 +114,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
     final json = jsonDecode(res.body) as Map<String, dynamic>;
 
-    // prefer namedetails.name, fall back to 'display_name'
     final namedetails = json['namedetails'] as Map<String, dynamic>?;
     final name =
         namedetails?['name'] as String? ??
@@ -230,16 +251,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    buildDate(context, 200),
-                    SizedBox(width: 20),
+                    // buildDate(context, 200),
+                    // SizedBox(width: 20),
                     buildSecNo(context, 180),
                   ],
                 );
               } else {
                 return Column(
                   children: [
-                    buildDate(context, 400),
-                    Padding(padding: EdgeInsets.only(bottom: 15)),
+                    // buildDate(context, 400),
+                    // Padding(padding: EdgeInsets.only(bottom: 15)),
                     buildSecNo(context, 400),
                   ],
                 );

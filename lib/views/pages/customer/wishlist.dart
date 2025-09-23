@@ -62,7 +62,23 @@ class _WishlistScreenState extends State<WishlistScreen> {
       final auth = context.read<AuthProvider>();
       final uid = auth.userId;
 
-      await CartService.addItem(uid!, item.productId, item.quantity);
+      if (item.product.type.toLowerCase() == 'digital') {
+        final exists = await CartService.isInUserCart(uid!, item.product.id);
+        if (exists) {
+          if (!mounted) return;
+          await showNoticeDialog(
+            context: context,
+            title: 'Adding to Cart failed',
+            message: "You already have this digital item in the Cart",
+            type: NoticeType.error,
+          );
+          setState(() => _isLoading = false);
+          return;
+        }
+        await CartService.addItem(uid, item.productId, item.quantity);
+      } else {
+        await CartService.addItem(uid!, item.productId, item.quantity);
+      }
 
       if (!mounted) return;
       await showNoticeDialog(
@@ -82,6 +98,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
         message: e.toString(),
         type: NoticeType.error,
       );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
