@@ -24,7 +24,10 @@ Widget MyTextField(
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: Colors.white)
+            ? Icon(
+                prefixIcon,
+                color: Theme.of(context).inputDecorationTheme.iconColor,
+              )
             : null,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -33,10 +36,6 @@ Widget MyTextField(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

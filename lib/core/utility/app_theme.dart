@@ -34,6 +34,11 @@ class AppTheme {
         helperStyle: TextStyle(fontSize: 12),
         errorStyle: TextStyle(fontSize: 12),
         border: OutlineInputBorder(),
+        iconColor: Colors.black,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.black),
+        ),
       ),
     );
   }
@@ -70,6 +75,11 @@ class AppTheme {
         helperStyle: TextStyle(fontSize: 12),
         errorStyle: TextStyle(fontSize: 12),
         border: OutlineInputBorder(),
+        iconColor: Colors.white,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.white),
+        ),
       ),
     );
   }

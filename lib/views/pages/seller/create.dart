@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/seller_service.dart';
+import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:gamenova2_mad1/views/widgets/image_container.dart';
 import 'package:gamenova2_mad1/views/widgets/text_field.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -70,6 +72,15 @@ class _ManageGameState extends State<ManageGame> {
       text: widget.game?.releasedAt ?? '',
     );
     loadUser();
+  }
+
+  void redirect() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => const MainNavScreen(selectPageIndex: 2),
+      ),
+      (route) => false,
+    );
   }
 
   Future<void> pickFromGallery() async {
@@ -148,7 +159,7 @@ class _ManageGameState extends State<ManageGame> {
         type: NoticeType.success,
       );
       if (!mounted) return;
-      Navigator.pop(context, true);
+      redirect();
     } on TimeoutException {
       if (!mounted) return;
       setState(() => _isSaving = false);
@@ -206,7 +217,7 @@ class _ManageGameState extends State<ManageGame> {
         message: 'Game Updated successfully.',
         type: NoticeType.success,
       );
-      Navigator.pop(context, true);
+      redirect();
     } on TimeoutException {
       if (!mounted) return;
       await showNoticeDialog(
@@ -265,6 +276,7 @@ class _ManageGameState extends State<ManageGame> {
       );
       if (!mounted) return;
       setState(() => _isSaving = false);
+      redirect();
     } on TimeoutException {
       if (!mounted) return;
       await showNoticeDialog(
@@ -323,6 +335,7 @@ class _ManageGameState extends State<ManageGame> {
       );
       if (!mounted) return;
       setState(() => _isSaving = false);
+      redirect();
     } on TimeoutException {
       if (!mounted) return;
       await showNoticeDialog(
@@ -352,7 +365,7 @@ class _ManageGameState extends State<ManageGame> {
 
   Widget readOnlyField(String label, String value) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.9,
+      width: MediaQuery.of(context).size.width * 0.8,
       child: TextFormField(
         initialValue: value,
         readOnly: true,
@@ -397,6 +410,10 @@ class _ManageGameState extends State<ManageGame> {
     return SizedBox(
       width: width,
       child: DropdownButtonFormField<String>(
+        icon: Icon(
+          Icons.layers,
+          color: Theme.of(context).inputDecorationTheme.iconColor,
+        ),
         initialValue: _selectedType,
         items: types
             .map((type) => DropdownMenuItem(value: type, child: Text(type)))
@@ -419,6 +436,10 @@ class _ManageGameState extends State<ManageGame> {
     return SizedBox(
       width: width,
       child: DropdownButtonFormField<String>(
+        icon: Icon(
+          Icons.library_books,
+          color: Theme.of(context).inputDecorationTheme.iconColor,
+        ),
         initialValue: _selectedGenre,
         items: genres
             .map((genre) => DropdownMenuItem(value: genre, child: Text(genre)))
@@ -441,6 +462,10 @@ class _ManageGameState extends State<ManageGame> {
     return SizedBox(
       width: width,
       child: DropdownButtonFormField<String>(
+        icon: Icon(
+          Icons.desktop_windows,
+          color: Theme.of(context).inputDecorationTheme.iconColor,
+        ),
         initialValue: _selectedPlatform,
         items: platforms
             .map(
@@ -478,280 +503,346 @@ class _ManageGameState extends State<ManageGame> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('Manage Games')),
       body: Center(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    Padding(padding: EdgeInsets.only(bottom: 30)),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      child: Column(
-                        children: [
-                          widget.game == null
-                              ? Text("Create a new Game")
-                              : Text("Update game: ${widget.game!.title}"),
-                          Padding(padding: EdgeInsets.only(bottom: 10)),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 60),
+            child: Column(
+              children: [
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Padding(padding: EdgeInsets.only(bottom: 30)),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: Column(
+                          children: [
+                            widget.game == null
+                                ? Text("Create a new Game")
+                                : Text(
+                                    "Update Game: ${widget.game!.title}",
+                                    textAlign: TextAlign.center,
+                                  ),
+                            Padding(padding: EdgeInsets.only(bottom: 10)),
 
-                          if (widget.game == null) ...[
-                            // img
-                            const SizedBox(height: 8),
-                            Container(
-                              width: 100,
-                              height: 100,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(40),
-                                border: Border.all(
-                                  width: 1,
-                                  color: Theme.of(context).colorScheme.primary,
+                            // img picker for creating products
+                            if (widget.game == null) ...[
+                              // img
+                              const SizedBox(height: 8),
+                              Container(
+                                width: 200,
+                                height: 200,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(40),
+                                  border: Border.all(
+                                    width: 1,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                ),
+                                child: _photoBytes != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.memory(
+                                          _photoBytes!,
+                                          width: 160,
+                                          height: 160,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : Text(
+                                        'No image selected',
+                                        style: TextStyle(fontSize: 12),
+                                        textAlign: TextAlign.center,
+                                      ),
+                              ),
+                              const SizedBox(height: 12),
+
+                              // img picker
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton.icon(
+                                      onPressed: pickFromGallery,
+                                      icon: const Icon(Icons.photo_library),
+                                      label: const Text('Gallery'),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    ElevatedButton.icon(
+                                      onPressed: pickFromCamera,
+                                      icon: const Icon(Icons.photo_camera),
+                                      label: const Text('Camera'),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: _photoBytes != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Image.memory(
-                                        _photoBytes!,
-                                        width: 160,
-                                        height: 160,
-                                        fit: BoxFit.cover,
+                            ],
+
+                            // img showing when updating
+                            if (widget.game != null) ...[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(23),
+                                child: productImage(widget.game!.imageUrl, 200),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+
+                            MyTextField(
+                              context,
+                              titleController,
+                              "Title",
+                              prefixIcon: Icons.title,
+                              validator: (value) =>
+                                  ProductValidation.validTitle(value),
+                            ),
+
+                            MyTextField(
+                              context,
+                              descriptionController,
+                              "Description",
+                              prefixIcon: Icons.description,
+                              validator: (value) =>
+                                  ProductValidation.validDescription(value),
+                            ),
+
+                            MyTextField(
+                              context,
+                              durationController,
+                              "Duration",
+                              prefixIcon: Icons.timelapse_outlined,
+                              validator: (value) =>
+                                  ProductValidation.validDuration(value),
+                            ),
+
+                            MyTextField(
+                              context,
+                              sizeController,
+                              "Size",
+                              prefixIcon: Icons.storage,
+                              validator: (value) =>
+                                  ProductValidation.validSize(value),
+                            ),
+
+                            MyTextField(
+                              context,
+                              ageRatingController,
+                              "Age Rating",
+                              prefixIcon: Icons.shield,
+                              validator: (value) =>
+                                  ProductValidation.validAgeRating(value),
+                            ),
+
+                            MyTextField(
+                              context,
+                              companyController,
+                              "Company",
+                              prefixIcon: Icons.business,
+                              validator: (value) =>
+                                  ProductValidation.validCompany(value),
+                            ),
+
+                            MyTextField(
+                              context,
+                              priceController,
+                              "Price",
+                              prefixIcon: Icons.attach_money_rounded,
+                              validator: (value) =>
+                                  ProductValidation.validPrice(value),
+                            ),
+
+                            buildDate(context),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 10),
+
+                      // selecting genre/type/platforms when creating (L and P)
+                      if (widget.game == null)
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            if (constraints.maxWidth > 800) {
+                              return Column(
+                                children: [
+                                  SizedBox(height: 20),
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      buildGenre(
+                                        context,
+                                        MediaQuery.of(context).size.width *
+                                            0.28,
+                                      ),
+                                      SizedBox(width: 20),
+
+                                      buildTypes(
+                                        context,
+                                        MediaQuery.of(context).size.width *
+                                            0.28,
+                                      ),
+                                      SizedBox(width: 20),
+
+                                      buildPlatform(
+                                        context,
+                                        MediaQuery.of(context).size.width *
+                                            0.28,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 30),
+                                ],
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  SizedBox(height: 10),
+                                  buildGenre(
+                                    context,
+                                    MediaQuery.of(context).size.width * 0.8,
+                                  ),
+                                  SizedBox(height: 20),
+
+                                  buildPlatform(
+                                    context,
+                                    MediaQuery.of(context).size.width * 0.8,
+                                  ),
+                                  SizedBox(height: 20),
+
+                                  buildTypes(
+                                    context,
+                                    MediaQuery.of(context).size.width * 0.8,
+                                  ),
+                                  SizedBox(height: 20),
+                                ],
+                              );
+                            }
+                          },
+                        ),
+
+                      // showing genre/type/platforms when creating readonly
+                      if (widget.game != null) ...[
+                        SizedBox(height: 10),
+                        readOnlyField(
+                          'Type',
+                          (widget.game!.type.toUpperCase()),
+                        ),
+                        SizedBox(height: 20),
+                        readOnlyField('Genre', widget.game!.genre),
+                        SizedBox(height: 20),
+                        readOnlyField('Platform', widget.game!.platform),
+                        SizedBox(height: 20),
+                      ],
+
+                      // manage if passing a game
+                      if (widget.game != null &&
+                          widget.game!.sellerId.toString() == seller) ...[
+                        // updating
+                        if (widget.game!.deletedAt == null)
+                          SizedBox(
+                            width: MediaQuery.sizeOf(context).width * 0.7,
+                            child: ElevatedButton.icon(
+                              onPressed: _isSaving ? null : update,
+                              icon: _isSaving
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
                                       ),
                                     )
-                                  : Text(
-                                      'No image selected',
-                                      style: TextStyle(fontSize: 12),
-                                      textAlign: TextAlign.center,
-                                    ),
-                            ),
-                            const SizedBox(height: 12),
-
-                            // img picker
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: pickFromGallery,
-                                    icon: const Icon(Icons.photo_library),
-                                    label: const Text('Gallery'),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  ElevatedButton.icon(
-                                    onPressed: pickFromCamera,
-                                    icon: const Icon(Icons.photo_camera),
-                                    label: const Text('Camera'),
-                                  ),
-                                ],
+                                  : Icon(Icons.edit),
+                              label: const Text(
+                                'UPDATE',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                ),
+                                minimumSize: const Size.fromHeight(48),
                               ),
                             ),
-                          ],
-
-                          MyTextField(
-                            context,
-                            titleController,
-                            "Title",
-                            prefixIcon: Icons.title,
-                            validator: (value) =>
-                                ProductValidation.validTitle(value),
                           ),
 
-                          MyTextField(
-                            context,
-                            descriptionController,
-                            "Description",
-                            prefixIcon: Icons.description,
-                            validator: (value) =>
-                                ProductValidation.validDescription(value),
-                          ),
+                        SizedBox(height: 20),
 
-                          MyTextField(
-                            context,
-                            durationController,
-                            "Duration",
-                            prefixIcon: Icons.timelapse_outlined,
-                            validator: (value) =>
-                                ProductValidation.validDuration(value),
-                          ),
-
-                          MyTextField(
-                            context,
-                            sizeController,
-                            "Size",
-                            // prefixIcon: Icons.,
-                            validator: (value) =>
-                                ProductValidation.validSize(value),
-                          ),
-
-                          MyTextField(
-                            context,
-                            ageRatingController,
-                            "Age Rating",
-                            // prefixIcon: Icons.age,
-                            validator: (value) =>
-                                ProductValidation.validAgeRating(value),
-                          ),
-
-                          MyTextField(
-                            context,
-                            companyController,
-                            "Company",
-                            prefixIcon: Icons.business,
-                            validator: (value) =>
-                                ProductValidation.validCompany(value),
-                          ),
-
-                          MyTextField(
-                            context,
-                            priceController,
-                            "Price",
-                            prefixIcon: Icons.attach_money_rounded,
-                            validator: (value) =>
-                                ProductValidation.validPrice(value),
-                          ),
-
-                          buildDate(context),
-                        ],
-                      ),
-                    ),
-
-                    if (widget.game == null)
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          if (constraints.maxWidth > 800) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                buildGenre(
-                                  context,
-                                  MediaQuery.of(context).size.width * 0.3,
-                                ),
-                                SizedBox(width: 20),
-
-                                buildTypes(
-                                  context,
-                                  MediaQuery.of(context).size.width * 0.3,
-                                ),
-                                SizedBox(width: 20),
-
-                                buildPlatform(
-                                  context,
-                                  MediaQuery.of(context).size.width * 0.3,
-                                ),
-                                SizedBox(width: 20),
-                              ],
-                            );
-                          } else {
-                            return Column(
-                              children: [
-                                buildGenre(
-                                  context,
-                                  MediaQuery.of(context).size.width * 0.9,
-                                ),
-                                SizedBox(height: 10),
-
-                                buildPlatform(
-                                  context,
-                                  MediaQuery.of(context).size.width * 0.9,
-                                ),
-                                SizedBox(height: 10),
-
-                                buildTypes(
-                                  context,
-                                  MediaQuery.of(context).size.width * 0.9,
-                                ),
-                                SizedBox(height: 10),
-                              ],
-                            );
-                          }
-                        },
-                      ),
-
-                    if (widget.game != null) ...[
-                      SizedBox(height: 15),
-                      readOnlyField('Type', (widget.game!.type.toUpperCase())),
-                      SizedBox(height: 15),
-                      readOnlyField('Genre', widget.game!.genre),
-                      SizedBox(height: 15),
-                      readOnlyField('Platform', widget.game!.platform),
-                      SizedBox(height: 20),
-                    ],
-
-                    SizedBox(
-                      width: MediaQuery.sizeOf(context).width * 0.5,
-                      child: ElevatedButton.icon(
-                        onPressed: _isSaving
-                            ? null
-                            : widget.game == null
-                            ? create
-                            : update,
-                        icon: _isSaving
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : widget.game == null
-                            ? Icon(Icons.save_alt)
-                            : Icon(Icons.edit),
-                        label: const Text(
-                          'SAVE',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          minimumSize: const Size.fromHeight(48),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-
-                    if (widget.game != null &&
-                        widget.game!.sellerId.toString() == seller)
-                      SizedBox(
-                        width: MediaQuery.sizeOf(context).width * 0.5,
-                        child: ElevatedButton.icon(
-                          onPressed: _isSaving
-                              ? null
-                              : (widget.game!.isTrashed ? restore : delete),
-                          icon: _isSaving
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                        // deleting and restoring
+                        SizedBox(
+                          width: MediaQuery.sizeOf(context).width * 0.7,
+                          child: ElevatedButton.icon(
+                            onPressed: _isSaving
+                                ? null
+                                : (widget.game!.isTrashed ? restore : delete),
+                            icon: _isSaving
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Icon(
+                                    widget.game!.isTrashed
+                                        ? Icons.restore
+                                        : Icons.delete,
                                   ),
-                                )
-                              : Icon(
-                                  widget.game!.isTrashed
-                                      ? Icons.restore
-                                      : Icons.delete,
-                                ),
-                          label: Text(
-                            widget.game!.isTrashed ? 'RESTORE' : 'DELETE',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
+                            label: Text(
+                              widget.game!.isTrashed ? 'RESTORE' : 'DELETE',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              minimumSize: const Size.fromHeight(48),
                             ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            minimumSize: const Size.fromHeight(48),
+                        ),
+                      ],
+
+                      // creating if game is null
+                      if (widget.game == null)
+                        SizedBox(
+                          width: MediaQuery.sizeOf(context).width * 0.7,
+                          child: ElevatedButton.icon(
+                            onPressed: _isSaving ? null : create,
+                            icon: _isSaving
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Icon(Icons.save_alt),
+                            label: const Text(
+                              'SAVE',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              minimumSize: const Size.fromHeight(48),
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

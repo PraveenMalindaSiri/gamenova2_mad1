@@ -38,7 +38,7 @@ class GameCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    game.title,
+                    "${game.title} - ${game.deletedAt != null ? "Deleted" : ""}",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
