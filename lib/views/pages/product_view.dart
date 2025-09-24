@@ -7,6 +7,7 @@ import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
 import 'package:gamenova2_mad1/core/service/cart_service.dart';
 import 'package:gamenova2_mad1/core/service/wishlist_service.dart';
+import 'package:gamenova2_mad1/views/pages/seller/create.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/image_container.dart';
 import 'package:provider/provider.dart';
@@ -20,12 +21,16 @@ class ProductViewScreen extends StatefulWidget {
 }
 
 class _ProductViewScreenState extends State<ProductViewScreen> {
-  int? amount;
-  String? error;
   final AmountCnt = TextEditingController(text: "1");
   final formkey = GlobalKey<FormState>();
 
   bool _isLoading = false;
+
+  @override
+  void dispose() {
+    AmountCnt.dispose();
+    super.dispose();
+  }
 
   Widget myIMG(String path, double width, double height) {
     return Padding(
@@ -138,6 +143,18 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     }
   }
 
+  Future<void> manage() async {
+    final auth = context.read<AuthProvider>();
+    final token = auth.token ?? '';
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ManageGame(game: widget.game, token: token),
+      ),
+    );
+  }
+
   Widget buildAmount() {
     return Form(
       key: formkey,
@@ -246,6 +263,9 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   }
 
   Widget buildPortrait() {
+    final auth = context.read<AuthProvider>();
+    final role = auth.role;
+
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondary),
       child: Column(
@@ -277,7 +297,10 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           // img
           Padding(
             padding: const EdgeInsets.all(11.0),
-            child: productImage(widget.game.imageUrl, 300),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(23),
+              child: productImage(widget.game.imageUrl, 300),
+            ),
           ),
           Padding(padding: EdgeInsets.only(bottom: 10)),
 
@@ -335,37 +358,32 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
             child: buildDetails("Duration:", "${widget.game.duration}H"),
           ),
 
-          // amount
-          buildAmount(),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
+          if (role == 'customer') ...[
+            // amount
+            buildAmount(),
+            Padding(padding: EdgeInsets.only(bottom: 10)),
 
-          // error
-          if (error != null)
-            Text(
-              error!,
-              style: TextStyle(color: Colors.red),
-              textAlign: TextAlign.center,
+            // buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                buildBtn("Add To Wishlist", () {
+                  if (formkey.currentState!.validate()) {
+                    final amount = int.parse(AmountCnt.text);
+                    addToWishlist(amount, widget.game);
+                  }
+                }),
+                buildBtn("Add To Cart", () {
+                  if (formkey.currentState!.validate()) {
+                    final amount = int.parse(AmountCnt.text);
+                    addToCart(amount, widget.game);
+                  }
+                }),
+              ],
             ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
+          ],
 
-          // buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              buildBtn("Add To Wishlist", () {
-                if (formkey.currentState!.validate()) {
-                  final amount = int.parse(AmountCnt.text);
-                  addToWishlist(amount, widget.game);
-                }
-              }),
-              buildBtn("Add To Cart", () {
-                if (formkey.currentState!.validate()) {
-                  final amount = int.parse(AmountCnt.text);
-                  addToCart(amount, widget.game);
-                }
-              }),
-            ],
-          ),
+          if (role == 'seller') ...[buildBtn("Manage", manage)],
           SizedBox(height: 50),
         ],
       ),
@@ -373,18 +391,27 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   }
 
   Widget buildLandscape() {
-    return SingleChildScrollView(
+    final auth = context.read<AuthProvider>();
+    final role = auth.role;
+
+    return Align(
+      alignment: Alignment.topCenter,
       child: Container(
+        padding: EdgeInsets.all(15),
+        constraints: BoxConstraints(maxWidth: 900),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Column(
               children: [
                 // IMG
-                productImage(widget.game.imageUrl, 220),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(23),
+                  child: productImage(widget.game.imageUrl, 220),
+                ),
                 SizedBox(height: 20),
 
                 // stickers
@@ -407,6 +434,43 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                           buildSticker('${widget.game.ageRating}+'),
                         ],
                       ),
+                      Padding(padding: EdgeInsets.only(bottom: 15)),
+
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              child: buildDetails(
+                                "Released Date:",
+                                widget.game.releasedAt!,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              child: buildDetails(
+                                "Size:",
+                                "${widget.game.size}GB",
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              child: buildDetails(
+                                "Company:",
+                                widget.game.company,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: buildDetails(
+                                "Duration:",
+                                "${widget.game.duration}H",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -422,9 +486,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                   padding: const EdgeInsets.only(bottom: 1.0),
                   child: Text(
                     widget.game.title,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium!.copyWith(fontSize: 24),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
 
@@ -433,79 +495,54 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                   padding: const EdgeInsets.only(bottom: 10.0),
                   child: Text(
                     "Rs.${widget.game.price}",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.35,
+                  child: Text(
+                    widget.game.description,
                     style: Theme.of(
                       context,
-                    ).textTheme.bodyMedium!.copyWith(fontSize: 24),
-                  ),
-                ),
-
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.45,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: buildDetails(
-                          "Released Date:",
-                          widget.game.releasedAt!,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: buildDetails("Size:", "${widget.game.size}GB"),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: buildDetails("Company:", widget.game.company),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
-                        child: buildDetails(
-                          "Duration:",
-                          "${widget.game.duration}H",
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // amount input
-                buildAmount(),
-                Padding(padding: EdgeInsets.only(bottom: 10)),
-
-                // error
-                if (error != null)
-                  Text(
-                    error!,
-                    style: TextStyle(color: Colors.red),
+                    ).textTheme.bodySmall!.copyWith(fontFamily: 'font2'),
                     textAlign: TextAlign.center,
                   ),
-
-                // buttons
-                SizedBox(height: 20),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      buildBtn("Add To Wishlist", () {
-                        if (formkey.currentState!.validate()) {
-                          final amount = int.parse(AmountCnt.text);
-                          addToWishlist(amount, widget.game);
-                        }
-                      }),
-
-                      SizedBox(height: 20),
-
-                      buildBtn("Add To Cart", () {
-                        if (formkey.currentState!.validate()) {
-                          final amount = int.parse(AmountCnt.text);
-                          addToCart(amount, widget.game);
-                        }
-                      }),
-                    ],
-                  ),
                 ),
+                SizedBox(height: 20),
+
+                if (role == 'customer') ...[
+                  // amount input
+                  buildAmount(),
+                  Padding(padding: EdgeInsets.only(bottom: 10)),
+
+                  // buttons
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        buildBtn("Add To Wishlist", () {
+                          if (formkey.currentState!.validate()) {
+                            final amount = int.parse(AmountCnt.text);
+                            addToWishlist(amount, widget.game);
+                          }
+                        }),
+
+                        SizedBox(height: 20),
+
+                        buildBtn("Add To Cart", () {
+                          if (formkey.currentState!.validate()) {
+                            final amount = int.parse(AmountCnt.text);
+                            addToCart(amount, widget.game);
+                          }
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+                if (role == 'seller') ...[buildBtn("Manage", manage)],
                 Padding(padding: EdgeInsets.only(bottom: 20)),
               ],
             ),
@@ -534,7 +571,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
               } else {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [buildLandscape(), SizedBox(height: 50)],
+                  children: [buildLandscape()],
                 );
               }
             },

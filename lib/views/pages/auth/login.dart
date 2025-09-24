@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/provider/auth_provider.dart';
-  import 'package:gamenova2_mad1/views/pages/auth/register.dart';
+import 'package:gamenova2_mad1/views/pages/auth/register.dart';
 import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:provider/provider.dart';
@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await showNoticeDialog(
         context: context,
         title: 'Login failed',
-        // message: e.toString(),
+        message: e.toString().replaceAll('Exception: ', ''),
         type: NoticeType.error,
       );
     } finally {
