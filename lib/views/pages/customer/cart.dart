@@ -9,6 +9,7 @@ import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:gamenova2_mad1/views/widgets/itemLanscape.dart';
 import 'package:gamenova2_mad1/views/widgets/itemPortrait.dart';
 import 'package:provider/provider.dart';
+import 'package:shake/shake.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -18,6 +19,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  late final ShakeDetector _detector;
   List<CartItem> _cart = [];
   bool _isLoading = true;
   bool _isSaving = false;
@@ -90,6 +92,49 @@ class _CartScreenState extends State<CartScreen> {
   //     );
   //   }
   // }
+
+  Future<void> clearCart() async {
+    try {
+      final auth = context.read<AuthProvider>();
+      final userId = auth.user!.id;
+
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Remove all the items from the cart?'),
+          content: Text('This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text('Clean'),
+            ),
+          ],
+        ),
+      );
+      if (confirm != true) return;
+
+      await CartService.cleanCart(userId);
+      if (!mounted) return;
+      await showNoticeDialog(
+        context: context,
+        title: 'Removed',
+        message: "Cart cleared.",
+        type: NoticeType.success,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      showNoticeDialog(
+        context: context,
+        title: 'Cart resetting failed',
+        message: e.toString(),
+        type: NoticeType.error,
+      );
+    }
+  }
 
   Future<void> remove(CartItem item) async {
     try {
@@ -217,6 +262,23 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     loadCart();
+
+    _detector = ShakeDetector.autoStart(
+      onPhoneShake: (event) async {
+        if (_isSaving || _isLoading || _cart.isEmpty) return;
+        _detector.stopListening();
+        await clearCart();
+        loadCart();
+      },
+      shakeThresholdGravity: 2.7,
+      shakeCountResetTime: 1000,
+    );
+  }
+
+  @override
+  void dispose() {
+    _detector.stopListening();
+    super.dispose();
   }
 
   Widget buildTotalPrice() {

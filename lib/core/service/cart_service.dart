@@ -30,6 +30,10 @@ class CartService {
     return _db.removeItem(userId: userId, productId: productId);
   }
 
+  static Future<void> cleanCart(int uid) async {
+    return _db.clearCart(uid);
+  }
+
   static Future<void> syncCart(String token, int userid) async {
     try {
       final cart = await _db.cartToMap(userid);

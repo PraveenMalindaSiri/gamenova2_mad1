@@ -27,7 +27,6 @@ class _OrderDetailsState extends State<OrderDetails> {
       setState(() {
         orders = items;
       });
-      if (mounted) setState(() => _isLoading = false);
     } on TimeoutException {
       if (!mounted) return;
       await showNoticeDialog(
@@ -37,8 +36,6 @@ class _OrderDetailsState extends State<OrderDetails> {
         type: NoticeType.warning,
       );
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-
       if (!mounted) return;
       await showNoticeDialog(
         context: context,
@@ -53,7 +50,7 @@ class _OrderDetailsState extends State<OrderDetails> {
     }
   }
 
-  Widget buidItem(OrderItem item) {
+  Widget buildItem(OrderItem item) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -115,7 +112,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                   Expanded(
                     child: ListView.separated(
                       itemBuilder: (context, index) {
-                        return buidItem(orders[index]);
+                        return buildItem(orders[index]);
                       },
                       separatorBuilder: (_, __) =>
                           const Padding(padding: EdgeInsets.all(5)),
