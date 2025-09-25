@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:gamenova2_mad1/core/models/cart.dart';
 import 'package:gamenova2_mad1/core/models/cart_db.dart';
+import 'package:gamenova2_mad1/core/utility/api_routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class CartService {
-  // static const String base = "127.0.0.1:8000";
-  static const String base = "192.168.1.100:8000";
-  static const String cartPath = "/api/cart";
-  static const String purchasePath = "/api/cart/success";
+  static const String base = ApiRoutes.base;
+  static const String cartPath = ApiRoutes.cartPath;
 
   static final CartDB _db = CartDB();
 

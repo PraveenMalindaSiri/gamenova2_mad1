@@ -101,6 +101,19 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     try {
       final auth = context.read<AuthProvider>();
       final uid = auth.userId;
+      final age = auth.age!;
+
+      if (age < game.ageRating) {
+        if (!mounted) return;
+        await showNoticeDialog(
+          context: context,
+          title: 'Adding to Cart failed',
+          message: "You are not old enough to buy this game!!!",
+          type: NoticeType.warning,
+        );
+        setState(() => _isLoading = false);
+        return;
+      }
 
       if (game.type.toLowerCase() == 'digital') {
         final exists = await CartService.isInUserCart(uid!, game.id);

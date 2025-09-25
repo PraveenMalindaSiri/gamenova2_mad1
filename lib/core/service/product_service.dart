@@ -2,17 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/utility/api_routes.dart';
 import 'package:http/http.dart' as http;
 
 class ProductService {
-  // static const String loginPath = "https://gamenova.duckdns.org/api/login";
-  // static const String registerPath =
-  //     "https://gamenova.duckdns.org/api/register";
-
-  // static const String basePath = "127.0.0.1:8000";
-  static const String basePath = "192.168.1.100:8000";
-  static const String homePath = "/api/home";
-  static const String productsPath = "/api/products";
+  static const String basePath = ApiRoutes.base;
+  static const String homePath = ApiRoutes.homePath;
+  static const String productsPath = ApiRoutes.productsPath;
 
   static Future<Map<String, List<Product>>> getHomeSreenSections() async {
     try {

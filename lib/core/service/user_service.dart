@@ -2,25 +2,22 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:gamenova2_mad1/core/models/user.dart';
+import 'package:gamenova2_mad1/core/utility/api_routes.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  // static const String loginPath = "https://gamenova.duckdns.org/api/login";
-  // static const String registerPath =
-  //     "https://gamenova.duckdns.org/api/register";
-
-  // static const String loginPath = "http://127.0.0.1:8000/api/login";
-  static const String loginPath = "http://192.168.1.100:8000/api/login";
-  // static const String registerPath = "http://127.0.0.1:8000/api/register";
-  static const String registerPath = "http://192.168.1.100:8000/api/register";
-  // static const String logoutPath = "http://127.0.0.1:8000/api/logout";
-  static const String logoutPath = "http://192.168.1.100:8000/api/logout";
+  static const String base = ApiRoutes.base;
+  static const String loginPath = ApiRoutes.loginPath;
+  static const String registerPath = ApiRoutes.registerPath;
+  static const String logoutPath = ApiRoutes.logoutPath;
 
   static Future<User> login(String email, String password) async {
     try {
+      final url = Uri.http(base, loginPath);
+
       final response = await http
           .post(
-            Uri.parse(loginPath),
+            url,
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
@@ -45,9 +42,11 @@ class UserService {
 
   static Future<User> register({required Map<String, dynamic> data}) async {
     try {
+      final url = Uri.http(base, registerPath);
+
       final response = await http
           .post(
-            Uri.parse(registerPath),
+            url,
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
@@ -76,9 +75,11 @@ class UserService {
     }
 
     try {
+      final url = Uri.http(base, logoutPath);
+
       final response = await http
           .post(
-            Uri.parse(logoutPath),
+            url,
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',

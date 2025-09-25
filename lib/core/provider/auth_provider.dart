@@ -26,4 +26,5 @@ class AuthProvider extends ChangeNotifier {
   String? get token => _user?.token;
   String? get role => _user?.role;
   int? get userId => _user?.id;
+  int? get age => _user?.age;
 }

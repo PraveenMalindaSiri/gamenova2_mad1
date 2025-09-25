@@ -31,6 +31,15 @@ class User {
     this.token,
   });
 
+  int? get age {
+    final b = dob;
+    if (b == null) return null;
+    final now = DateTime.now();
+    var years = now.year - b.year;
+
+    return years;
+  }
+
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] as int,

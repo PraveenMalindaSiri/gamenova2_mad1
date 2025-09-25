@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:gamenova2_mad1/core/models/product.dart';
+import 'package:gamenova2_mad1/core/utility/api_routes.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class SellerService {
   // static const String basePath = "127.0.0.1:8000";
-  static const String basePath = "192.168.1.100:8000";
-  static const String productsPath = "/api/myproducts";
+  static const String basePath = ApiRoutes.base;
+  static const String productsPath = ApiRoutes.sellerProductsPath;
 
   static Future<List<Product>> getSellerGames(String token) async {
     try {
@@ -113,7 +114,7 @@ class SellerService {
               'Accept': 'application/json',
               'Authorization': 'Bearer $token',
             },
-            body: jsonEncode( data),
+            body: jsonEncode(data),
           )
           .timeout(const Duration(seconds: 30));
 

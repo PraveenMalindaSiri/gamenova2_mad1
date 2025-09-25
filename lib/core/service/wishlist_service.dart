@@ -1,14 +1,13 @@
 import 'dart:convert';
 
 import 'package:gamenova2_mad1/core/models/wishlist.dart';
+import 'package:gamenova2_mad1/core/utility/api_routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class WishlistService {
-  // static const String base = "127.0.0.1:8000";
-  static const String base = "192.168.1.100:8000";
-
-  static const String wishlistPath = "/api/wishlist";
+  static const String base = ApiRoutes.base;
+  static const String wishlistPath = ApiRoutes.wishlistPath;
 
   static Future<List<WishlistItem>> getWishlist(String token) async {
     try {
