@@ -94,7 +94,7 @@ class ItemLanscapeView extends StatelessWidget {
               ),
               Column(
                 children: [
-                  SizedBox(height: 10,),
+                  SizedBox(height: 10),
                   SizedBox(
                     width: 200,
                     child: Text(
@@ -114,22 +114,20 @@ class ItemLanscapeView extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  SizedBox(height: 10,),
+                  SizedBox(height: 10),
                   Text(
                     "Rs.${game.price * amount}",
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10,),
-                  MyButton(
-                    "Remove",
-                    onRemove,
-                    isDark ? Colors.white : Colors.black,
-                  ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  SizedBox(height: 10),
+
                   if (isWishlist && onCart != null)
                     MyButton("Add to Cart", onCart!, Colors.black),
+                  SizedBox(height: 10),
+
+                  MyButton("Remove", onRemove, Colors.white),
                 ],
               ),
             ],

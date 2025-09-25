@@ -112,7 +112,12 @@ class _OrderDetailsState extends State<OrderDetails> {
                   Expanded(
                     child: ListView.separated(
                       itemBuilder: (context, index) {
-                        return buildItem(orders[index]);
+                        return Align(
+                          alignment: Alignment.center,
+                          child: SizedBox(
+                            width: 500,
+                            child: buildItem(orders[index])),
+                        );
                       },
                       separatorBuilder: (_, __) =>
                           const Padding(padding: EdgeInsets.all(5)),

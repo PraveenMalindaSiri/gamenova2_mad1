@@ -374,7 +374,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
           if (role == 'customer') ...[
             // amount
             buildAmount(),
-            Padding(padding: EdgeInsets.only(bottom: 10)),
+            SizedBox(height: 30),
 
             // buttons
             Row(

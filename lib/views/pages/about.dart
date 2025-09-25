@@ -47,10 +47,11 @@ class _AboutState extends State<About> {
           : Center(
               child: SingleChildScrollView(
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
+                  width: MediaQuery.of(context).size.width * 0.8,
 
                   child: Column(
                     children: [
+                      SizedBox(height: 10),
                       Text(
                         welcomeData!.title,
                         style: Theme.of(context).textTheme.bodyLarge,

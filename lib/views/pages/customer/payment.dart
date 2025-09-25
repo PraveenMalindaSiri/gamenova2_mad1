@@ -191,120 +191,123 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget _buildForm(context) {
     return Form(
       key: formkey,
-      child: Column(
-        children: [
-          // name
-          SizedBox(
-            width: 400,
-            child: TextFormField(
-              controller: CardHolder,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return ("Please fill the Card Holder name corectly.");
-                }
-                if (value.length < 6) {
-                  return ("Card Holder name should have at least 6 letters");
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                hintText: "Card Holder",
-                border: OutlineInputBorder(),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          children: [
+            // name
+            SizedBox(
+              width: 400,
+              child: TextFormField(
+                controller: CardHolder,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return ("Please fill the Card Holder name corectly.");
+                  }
+                  if (value.length < 6) {
+                    return ("Card Holder name should have at least 6 letters");
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: "Card Holder",
+                  border: OutlineInputBorder(),
+                ),
               ),
             ),
-          ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
-
-          // card no
-          SizedBox(
-            width: 400,
-            child: TextFormField(
-              controller: CardNo,
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return ("Please fill the Card No. corectly.");
-                }
-
-                final cn = int.tryParse(value);
-
-                if (cn == null) {
-                  return ("Card No. must be a number.");
-                }
-                if (value.length < 12 || value.length > 19) {
-                  return ("Card No. should have between 12 and 19 numbers");
-                }
-                return null;
-              },
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: "Card No.",
-                border: OutlineInputBorder(),
+            Padding(padding: EdgeInsets.only(bottom: 10)),
+        
+            // card no
+            SizedBox(
+              width: 400,
+              child: TextFormField(
+                controller: CardNo,
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return ("Please fill the Card No. corectly.");
+                  }
+        
+                  final cn = int.tryParse(value);
+        
+                  if (cn == null) {
+                    return ("Card No. must be a number.");
+                  }
+                  if (value.length < 12 || value.length > 19) {
+                    return ("Card No. should have between 12 and 19 numbers");
+                  }
+                  return null;
+                },
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: "Card No.",
+                  border: OutlineInputBorder(),
+                ),
               ),
             ),
-          ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
-
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth > 800) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // buildDate(context, 200),
-                    // SizedBox(width: 20),
-                    buildSecNo(context, 180),
-                  ],
-                );
-              } else {
-                return Column(
-                  children: [
-                    // buildDate(context, 400),
-                    // Padding(padding: EdgeInsets.only(bottom: 15)),
-                    buildSecNo(context, 400),
-                  ],
-                );
-              }
-            },
-          ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
-
-          SizedBox(
-            width: 400,
-            child: TextFormField(
-              controller: Address,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return ("Please fill the Address name corectly.");
+            Padding(padding: EdgeInsets.only(bottom: 10)),
+        
+            LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 800) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // buildDate(context, 200),
+                      // SizedBox(width: 20),
+                      buildSecNo(context, 400),
+                    ],
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      // buildDate(context, 400),
+                      // Padding(padding: EdgeInsets.only(bottom: 15)),
+                      buildSecNo(context, 400),
+                    ],
+                  );
                 }
-                if (value.length < 3) {
-                  return ("Address name should have at least 3 letters");
-                }
-                return null;
               },
-              decoration: InputDecoration(
-                hintText: "Address",
-                border: OutlineInputBorder(),
+            ),
+            Padding(padding: EdgeInsets.only(bottom: 10)),
+        
+            SizedBox(
+              width: 400,
+              child: TextFormField(
+                controller: Address,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return ("Please fill the Address name corectly.");
+                  }
+                  if (value.length < 3) {
+                    return ("Address name should have at least 3 letters");
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: "Address",
+                  border: OutlineInputBorder(),
+                ),
               ),
             ),
-          ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
-
-          // button
-          ElevatedButton(
-            onPressed: _isSaving ? null : payment,
-            child: _isSaving
-                ? const SizedBox(
-                    height: 22,
-                    width: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text(
-                    'PAYMENT',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                  ),
-          ),
-        ],
+            Padding(padding: EdgeInsets.only(bottom: 10)),
+        
+            // button
+            ElevatedButton(
+              onPressed: _isSaving ? null : payment,
+              child: _isSaving
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text(
+                      'PAYMENT',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

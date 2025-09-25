@@ -251,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               }
             },
           ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
+          Padding(padding: EdgeInsets.only(bottom: 20)),
 
           // button
           SizedBox(
@@ -306,7 +306,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
-          child: Column(children: [_buildForm(context)]),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 18.0),
+                child: _buildForm(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
