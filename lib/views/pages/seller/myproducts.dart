@@ -84,7 +84,7 @@ class _MyProductsState extends State<MyProducts> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : games.isEmpty
-          ? Center(child: Text("No Wishlist available."))
+          ? Center(child: Text("You haven't added any games yet!"))
           : ListView.separated(
               separatorBuilder: (_, __) =>
                   const Padding(padding: EdgeInsets.all(5)),

@@ -11,6 +11,7 @@ Widget productImage(String pathOrUrl, double height) {
   return Image.network(
     src,
     height: height,
+    width: double.infinity,
     fit: BoxFit.cover,
     errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 200),
   );
