@@ -371,7 +371,13 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
             child: buildDetails("Duration:", "${widget.game.duration}H"),
           ),
 
-          if (role == 'customer') ...[
+          if (widget.game.deletedAt != null)
+            Text(
+              "This is a deleted item",
+              style: Theme.of(context).textTheme.bodySmall!,
+            ),
+
+          if (role == 'customer' && widget.game.deletedAt == null) ...[
             // amount
             buildAmount(),
             SizedBox(height: 30),
@@ -410,131 +416,119 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     return Align(
       alignment: Alignment.topCenter,
       child: Container(
-        padding: EdgeInsets.all(15),
-        constraints: BoxConstraints(maxWidth: 900),
+        padding: const EdgeInsets.all(15),
+        constraints: const BoxConstraints(maxWidth: 800),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              children: [
-                // IMG
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(23),
-                  child: productImage(widget.game.imageUrl, 220),
-                ),
-                SizedBox(height: 20),
+            Expanded(
+              flex: 5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // IMG
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(23),
+                    child: productImage(widget.game.imageUrl, 220),
+                  ),
+                  const SizedBox(height: 20),
 
-                // stickers
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  child: Column(
+                  // stickers 
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          buildSticker('${widget.game.type} Edition'),
-                          buildSticker('${widget.game.genre} games'),
-                        ],
-                      ),
-                      Padding(padding: EdgeInsets.only(bottom: 10)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          buildSticker(widget.game.platform),
-                          buildSticker('${widget.game.ageRating}+'),
-                        ],
-                      ),
-                      Padding(padding: EdgeInsets.only(bottom: 15)),
+                      buildSticker('${widget.game.type} Edition'),
+                      buildSticker('${widget.game.genre} games'),
+                      buildSticker(widget.game.platform),
+                      buildSticker('${widget.game.ageRating}+'),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
 
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10.0),
-                              child: buildDetails(
-                                "Released Date:",
-                                widget.game.releasedAt!,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10.0),
-                              child: buildDetails(
-                                "Size:",
-                                "${widget.game.size}GB",
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10.0),
-                              child: buildDetails(
-                                "Company:",
-                                widget.game.company,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 20.0),
-                              child: buildDetails(
-                                "Duration:",
-                                "${widget.game.duration}H",
-                              ),
-                            ),
-                          ],
+                  // details
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: buildDetails(
+                          "Released Date:",
+                          widget.game.releasedAt!,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: buildDetails("Size:", "${widget.game.size}GB"),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: buildDetails("Company:", widget.game.company),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: buildDetails(
+                          "Duration:",
+                          "${widget.game.duration}H",
                         ),
                       ),
                     ],
                   ),
-                ),
-                Padding(padding: EdgeInsets.only(bottom: 20)),
-              ],
+                ],
+              ),
             ),
-            Column(
-              children: [
-                Padding(padding: EdgeInsets.only(bottom: 10)),
 
-                // name
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 1.0),
-                  child: Text(
+            const SizedBox(width: 24),
+
+            Expanded(
+              flex: 6,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+
+                  // name
+                  Text(
                     widget.game.title,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                ),
+                  const SizedBox(height: 6),
 
-                // price
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Text(
+                  // price
+                  Text(
                     "Rs.${widget.game.price}",
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                ),
+                  const SizedBox(height: 12),
 
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.35,
-                  child: Text(
+                  // description
+                  Text(
                     widget.game.description,
                     style: Theme.of(
                       context,
                     ).textTheme.bodySmall!.copyWith(fontFamily: 'font2'),
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                   ),
-                ),
-                SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                if (role == 'customer') ...[
-                  // amount input
-                  buildAmount(),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  if (widget.game.deletedAt != null)
+                    Text(
+                      "This is a deleted item",
+                      style: Theme.of(context).textTheme.bodySmall!,
+                    ),
 
-                  // buttons
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  if (role == 'customer' && widget.game.deletedAt == null) ...[
+                    // amount input
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25),
+                      child: buildAmount(),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // buttons 
+                    Row(
                       children: [
                         buildBtn("Add To Wishlist", () {
                           if (formkey.currentState!.validate()) {
@@ -542,9 +536,11 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                             addToWishlist(amount, widget.game);
                           }
                         }),
-
-                        SizedBox(height: 20),
-
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
                         buildBtn("Add To Cart", () {
                           if (formkey.currentState!.validate()) {
                             final amount = int.parse(AmountCnt.text);
@@ -553,11 +549,18 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                         }),
                       ],
                     ),
-                  ),
+                  ],
+
+                  if (role == 'seller') ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [Expanded(child: buildBtn("Manage", manage))],
+                    ),
+                  ],
+
+                  const SizedBox(height: 20),
                 ],
-                if (role == 'seller') ...[buildBtn("Manage", manage)],
-                Padding(padding: EdgeInsets.only(bottom: 20)),
-              ],
+              ),
             ),
           ],
         ),

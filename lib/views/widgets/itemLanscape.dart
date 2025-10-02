@@ -30,6 +30,7 @@ class ItemLanscapeView extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
             icon: const Icon(Icons.remove),
@@ -67,10 +68,10 @@ class ItemLanscapeView extends StatelessWidget {
             ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(2.0),
+                padding: const EdgeInsets.fromLTRB(28, 8, 10, 8),
                 child: GestureDetector(
                   onDoubleTap: () {
                     Navigator.push(
@@ -87,48 +88,59 @@ class ItemLanscapeView extends StatelessWidget {
                         border: Border.all(color: Colors.black, width: 2),
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      child: productImage(game.imageUrl, 180),
+                      child: SizedBox(
+                        width: 220,
+                        child: productImage(game.imageUrl, 220),
+                      ),
                     ),
                   ),
                 ),
               ),
-              Column(
-                children: [
-                  SizedBox(height: 10),
-                  SizedBox(
-                    width: 200,
-                    child: Text(
+
+              Expanded(
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+
+                    Text(
                       game.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  if (game.type.toLowerCase() != 'digital' && isWishlist)
-                    updateWishlistAmnt(context),
-                  if (game.type.toLowerCase() == 'digital')
+
+                    SizedBox(height: 10),
+
+                    if (game.type.toLowerCase() != 'digital' && isWishlist)
+                      updateWishlistAmnt(context),
+                    if (game.type.toLowerCase() == 'digital')
+                      Text(
+                        "x $amount",
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    SizedBox(height: 10),
                     Text(
-                      "x $amount",
+                      "Rs.${game.price * amount}",
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Rs.${game.price * amount}",
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
+                    SizedBox(height: 10),
 
-                  if (isWishlist && onCart != null)
-                    MyButton("Add to Cart", onCart!, Colors.black),
-                  SizedBox(height: 10),
+                    if (isWishlist && onCart != null)
+                      MyButton("Add to Cart", onCart!, Colors.black),
+                    SizedBox(height: 10),
 
-                  MyButton("Remove", onRemove, Colors.white),
-                ],
+                    MyButton("Remove", onRemove, Colors.white),
+
+                    SizedBox(height: 10),
+                  ],
+                ),
               ),
             ],
           ),
