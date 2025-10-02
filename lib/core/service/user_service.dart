@@ -13,7 +13,7 @@ class UserService {
 
   static Future<User> login(String email, String password) async {
     try {
-      final url = Uri.http(base, loginPath);
+      final url = Uri.https(base, loginPath);
 
       final response = await http
           .post(
@@ -42,7 +42,7 @@ class UserService {
 
   static Future<User> register({required Map<String, dynamic> data}) async {
     try {
-      final url = Uri.http(base, registerPath);
+      final url = Uri.https(base, registerPath);
 
       final response = await http
           .post(
@@ -75,7 +75,7 @@ class UserService {
     }
 
     try {
-      final url = Uri.http(base, logoutPath);
+      final url = Uri.https(base, logoutPath);
 
       final response = await http
           .post(

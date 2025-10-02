@@ -12,7 +12,7 @@ class PaymentService {
 
   static Future<int> payment(String token) async {
     try {
-      final url = Uri.http(base, purchasePath);
+      final url = Uri.https(base, purchasePath);
 
       final res = await http
           .post(
@@ -39,7 +39,7 @@ class PaymentService {
 
   static Future<List<OrderItem>> orders(String token, int id) async {
     try {
-      final url = Uri.http(base, "$itemsPath/$id");
+      final url = Uri.https(base, "$itemsPath/$id");
 
       final response = await http
           .get(

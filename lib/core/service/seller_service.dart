@@ -14,7 +14,7 @@ class SellerService {
 
   static Future<List<Product>> getSellerGames(String token) async {
     try {
-      final url = Uri.http(basePath, productsPath);
+      final url = Uri.https(basePath, productsPath);
 
       final response = await http.Client()
           .get(
@@ -52,7 +52,7 @@ class SellerService {
     required XFile photo,
   }) async {
     try {
-      final url = Uri.http(basePath, productsPath);
+      final url = Uri.https(basePath, productsPath);
       final req = http.MultipartRequest('POST', url)
         ..headers['Authorization'] = 'Bearer $token'
         ..headers['Accept'] = 'application/json'
@@ -105,7 +105,7 @@ class SellerService {
     required String token,
   }) async {
     try {
-      final url = Uri.http(basePath, "$productsPath/$id");
+      final url = Uri.https(basePath, "$productsPath/$id");
       final res = await http
           .put(
             url,
@@ -136,7 +136,7 @@ class SellerService {
     required String token,
   }) async {
     try {
-      final url = Uri.http(basePath, "$productsPath/$id");
+      final url = Uri.https(basePath, "$productsPath/$id");
       final res = await http
           .delete(
             url,
@@ -165,7 +165,7 @@ class SellerService {
     required String token,
   }) async {
     try {
-      final url = Uri.http(basePath, "$productsPath/$id/restore");
+      final url = Uri.https(basePath, "$productsPath/$id/restore");
       final res = await http
           .patch(
             url,

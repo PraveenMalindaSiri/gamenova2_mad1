@@ -11,7 +11,7 @@ class WishlistService {
 
   static Future<List<WishlistItem>> getWishlist(String token) async {
     try {
-      final url = Uri.http(base, wishlistPath);
+      final url = Uri.https(base, wishlistPath);
 
       final response = await http
           .get(
@@ -47,7 +47,7 @@ class WishlistService {
     int quantity = 1,
   }) async {
     try {
-      final url = Uri.http(base, wishlistPath);
+      final url = Uri.https(base, wishlistPath);
       final res = await http
           .post(
             url,
@@ -82,7 +82,7 @@ class WishlistService {
     required int quantity,
   }) async {
     try {
-      final url = Uri.http(base, '$wishlistPath/$id');
+      final url = Uri.https(base, '$wishlistPath/$id');
       final res = await http
           .put(
             url,
@@ -114,7 +114,7 @@ class WishlistService {
     required int id,
   }) async {
     try {
-      final url = Uri.http(base, '$wishlistPath/$id');
+      final url = Uri.https(base, '$wishlistPath/$id');
       final res = await http
           .delete(
             url,

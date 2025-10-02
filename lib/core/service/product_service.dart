@@ -12,7 +12,7 @@ class ProductService {
 
   static Future<Map<String, List<Product>>> getHomeSreenSections() async {
     try {
-      final url = Uri.http(basePath, homePath);
+      final url = Uri.https(basePath, homePath);
 
       final response = await http.Client()
           .get(url, headers: {'Content-Type': 'application/json'})
@@ -29,9 +29,9 @@ class ProductService {
             .map((e) => Product.fromJson(e))
             .toList();
 
-        print("===========================================");
+        print("=================== ===================== ================================ ========================= ============================ ================================");
         print(latest);
-        print(featured);
+        // print(featured);
 
         return {'latest': latest, 'featured': featured};
       } else {
@@ -57,7 +57,7 @@ class ProductService {
         params['platform'] = platform;
       }
 
-      final url = Uri.http(
+      final url = Uri.https(
         basePath,
         productsPath,
         params.isEmpty ? null : params,
@@ -87,7 +87,7 @@ class ProductService {
 
   static Future<Product> getProductDetails(String id) async {
     try {
-      final url = Uri.http(basePath, "$productsPath/$id");
+      final url = Uri.https(basePath, "$productsPath/$id");
 
       final response = await http
           .get(url, headers: {'Content-Type': 'application/json'})

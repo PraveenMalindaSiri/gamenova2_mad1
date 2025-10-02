@@ -37,7 +37,7 @@ class CartService {
     try {
       final cart = await _db.cartToMap(userid);
 
-      final url = Uri.http(base, "$cartPath/sync");
+      final url = Uri.https(base, "$cartPath/sync");
 
       final res = await http
           .post(
@@ -66,7 +66,7 @@ class CartService {
 
   static Future<List<CartItem>> getCartAPI(String token) async {
     try {
-      final url = Uri.http(base, cartPath);
+      final url = Uri.https(base, cartPath);
 
       final response = await http
           .get(
@@ -103,7 +103,7 @@ class CartService {
     int quantity = 1,
   }) async {
     try {
-      final url = Uri.parse('$base$cartPath');
+      final url = Uri.https(base, cartPath);
       final res = await http
           .post(
             url,
@@ -137,7 +137,7 @@ class CartService {
     required int id,
   }) async {
     try {
-      final url = Uri.parse('$base$cartPath/$id');
+      final url = Uri.https(base, "$cartPath/$id");
       final res = await http
           .delete(
             url,
