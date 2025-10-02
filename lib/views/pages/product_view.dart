@@ -293,6 +293,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium!.copyWith(fontSize: 24),
+              textAlign: TextAlign.center,
             ),
           ),
 
@@ -436,7 +437,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // stickers 
+                  // stickers
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -527,7 +528,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // buttons 
+                    // buttons
                     Row(
                       children: [
                         buildBtn("Add To Wishlist", () {
