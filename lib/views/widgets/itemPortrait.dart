@@ -97,6 +97,7 @@ class ItemPortraitView extends StatelessWidget {
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
             Row(

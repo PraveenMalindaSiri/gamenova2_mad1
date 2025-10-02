@@ -62,19 +62,26 @@ class _OrderDetailsState extends State<OrderDetails> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Column(
-              children: [
-                Text(
-                  item.product.title,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                Text(
-                  item.product.type,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.product.title,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                  Text(
+                    item.product.type,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
             ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   item.quantity.toString(),
@@ -116,7 +123,8 @@ class _OrderDetailsState extends State<OrderDetails> {
                           alignment: Alignment.center,
                           child: SizedBox(
                             width: 500,
-                            child: buildItem(orders[index])),
+                            child: buildItem(orders[index]),
+                          ),
                         );
                       },
                       separatorBuilder: (_, __) =>

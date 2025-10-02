@@ -44,6 +44,9 @@ class GameCard extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    softWrap: false,
                     textAlign: TextAlign.left,
                   ),
                   Text(
