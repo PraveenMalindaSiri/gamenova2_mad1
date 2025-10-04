@@ -9,6 +9,7 @@ import 'package:gamenova2_mad1/views/pages/home.dart';
 import 'package:gamenova2_mad1/views/pages/products.dart';
 import 'package:gamenova2_mad1/views/pages/seller/myproducts.dart';
 import 'package:gamenova2_mad1/views/widgets/navbar.dart';
+import 'package:gamenova2_mad1/views/widgets/network_info.dart';
 import 'package:provider/provider.dart';
 
 class MainNavScreen extends StatefulWidget {
@@ -95,6 +96,10 @@ class _MainNavScreenState extends State<MainNavScreen> {
         title: const Center(
           child: Text("GameNova", style: TextStyle(fontSize: 30)),
         ),
+        actions: [Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: NetworkInfo(),
+        )],
       ),
       drawer: Drawer(
         child: SingleChildScrollView(
