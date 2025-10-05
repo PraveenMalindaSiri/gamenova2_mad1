@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gamenova2_mad1/core/models/cart.dart';
 import 'package:gamenova2_mad1/core/models/cartItems_db.dart';
@@ -74,6 +75,10 @@ class CartService {
       throw Exception(body['message'] ?? 'Failed to sync the cart');
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Syncing failed: $e');
     }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/utility/api_routes.dart';
@@ -41,6 +42,10 @@ class SellerService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception("Loading seller products failed: $e");
     }
@@ -94,6 +99,10 @@ class SellerService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Creating failed: $e');
     }
@@ -126,6 +135,10 @@ class SellerService {
       throw Exception(body['message'] ?? 'Failed to update the product');
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Updating failed: $e');
     }
@@ -155,6 +168,10 @@ class SellerService {
       throw Exception(body['message'] ?? 'Failed to delete the product');
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Deleting failed: $e');
     }
@@ -184,6 +201,10 @@ class SellerService {
       throw Exception(body['message'] ?? 'Failed to restore the product');
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Restoring failed: $e');
     }

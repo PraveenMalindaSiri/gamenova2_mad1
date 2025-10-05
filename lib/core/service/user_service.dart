@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gamenova2_mad1/core/models/user.dart';
 import 'package:gamenova2_mad1/core/utility/api_routes.dart';
@@ -35,6 +36,10 @@ class UserService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Login failed: $e');
     }
@@ -64,6 +69,10 @@ class UserService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Registering failed: $e');
     }
@@ -96,6 +105,10 @@ class UserService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('LogOut failed: $e');
     }

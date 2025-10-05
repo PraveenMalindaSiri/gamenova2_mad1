@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gamenova2_mad1/core/models/home_db.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
@@ -105,6 +106,10 @@ class ProductService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Loading products failed: $e');
     }
@@ -127,6 +132,10 @@ class ProductService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Product Details loading failed: $e');
     }

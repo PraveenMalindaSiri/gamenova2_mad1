@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:gamenova2_mad1/core/models/wishlist.dart';
 import 'package:gamenova2_mad1/core/utility/api_routes.dart';
@@ -36,6 +37,10 @@ class WishlistService {
       }
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Loading wishlist failed: $e');
     }
@@ -71,6 +76,10 @@ class WishlistService {
       throw Exception(body['message'] ?? 'Failed to add wishlist');
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Wishlist add failed: $e');
     }
@@ -104,6 +113,10 @@ class WishlistService {
       throw Exception(body['message'] ?? 'Failed to update wishlist item');
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Wishlist update failed: $e');
     }
@@ -130,6 +143,10 @@ class WishlistService {
       throw Exception(body['message'] ?? 'Failed to remove wishlist item');
     } on TimeoutException {
       throw Exception('Connection timed out. Please try again.');
+    } on SocketException {
+      throw Exception(
+        'You appear to be offline. Please check your internet connection.',
+      );
     } catch (e) {
       throw Exception('Wishlist delete failed: $e');
     }
