@@ -1,4 +1,5 @@
 import 'package:gamenova2_mad1/core/models/cart.dart';
+import 'package:gamenova2_mad1/core/models/cartItems_db.dart';
 import 'package:gamenova2_mad1/core/models/product.dart';
 import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:sqflite/sqflite.dart';
@@ -43,33 +44,43 @@ class CartDB {
     );
 
     final List<CartItem> items = [];
+    final CartItemsDb ctdb = CartItemsDb();
 
     for (var r in rows) {
       final pid = r['product_id'] as int;
-      Product product;
+      Product? product;
 
-      try {
-        final p = await ProductService.getProductDetails(pid.toString());
-        product = p;
-      } catch (_) {
-        product = Product(
-          id: pid,
-          title: 'Unavailable',
-          genre: 'N/A',
-          platform: 'N/A',
-          type: 'digital',
-          price: 0,
-          company: 'N/A',
-          size: 0.0,
-          duration: 'N/A',
-          ageRating: 0,
-          description: 'N/A',
-          imageUrl: 'N/A',
-          sellerId: 0,
-          createdAt: 'N/A',
-          featured: false,
-        );
+      product = await ctdb.getAnItem(pid);
+
+      if (product == null) {
+        try {
+          final p = await ProductService.getProductDetails(pid.toString());
+          product = p;
+          try {
+            // saving the new item
+            await ctdb.saveAnItem(p);
+          } catch (_) {}
+        } catch (_) {
+          product = Product(
+            id: pid,
+            title: 'Unavailable',
+            genre: 'N/A',
+            platform: 'N/A',
+            type: 'digital',
+            price: 0,
+            company: 'N/A',
+            size: 0.0,
+            duration: 'N/A',
+            ageRating: 0,
+            description: 'N/A',
+            imageUrl: 'N/A',
+            sellerId: 0,
+            createdAt: 'N/A',
+            featured: false,
+          );
+        }
       }
+      
       items.add(
         CartItem(
           id: r['cart_id'] as int,

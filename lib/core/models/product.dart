@@ -60,6 +60,26 @@ class Product {
       featured: json['featured'] == 1 || json['featured'] == true,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'type': type,
+    'genre': genre,
+    'platform': platform,
+    'price': price,
+    'company': company,
+    'released_date': releasedAt,
+    'size': size,
+    'duration': duration,
+    'age_rating': ageRating,
+    'description': description,
+    'image_url': imageUrl,
+    'seller_id': sellerId,
+    'created_at': createdAt,
+    'deleted_at': deletedAt,
+    'featured': featured,
+  };
 }
 
 class ProductValidation {

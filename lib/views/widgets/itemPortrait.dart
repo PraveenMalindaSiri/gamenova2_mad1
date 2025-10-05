@@ -12,6 +12,7 @@ class ItemPortraitView extends StatelessWidget {
   final void Function(int delta)? onUpdate;
   final VoidCallback onRemove;
   final VoidCallback? onCart;
+  final bool canRedirect;
   const ItemPortraitView({
     super.key,
     required this.game,
@@ -20,6 +21,7 @@ class ItemPortraitView extends StatelessWidget {
     required this.onRemove,
     this.onUpdate,
     this.onCart,
+    required this.canRedirect,
   });
 
   Widget updateWishlistAmnt(BuildContext context) {
@@ -72,12 +74,14 @@ class ItemPortraitView extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
                 onDoubleTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProductViewScreen(game: game),
-                    ),
-                  );
+                  if (canRedirect) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductViewScreen(game: game),
+                      ),
+                    );
+                  }
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5),

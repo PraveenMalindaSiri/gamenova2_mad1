@@ -12,6 +12,7 @@ class ItemLanscapeView extends StatelessWidget {
   final VoidCallback onRemove;
   final void Function(int delta)? onUpdate;
   final VoidCallback? onCart;
+  final bool canRedirect;
   const ItemLanscapeView({
     super.key,
     required this.game,
@@ -20,6 +21,7 @@ class ItemLanscapeView extends StatelessWidget {
     required this.onRemove,
     this.onUpdate,
     this.onCart,
+    required this.canRedirect,
   });
 
   Widget updateWishlistAmnt(BuildContext context) {
@@ -74,12 +76,14 @@ class ItemLanscapeView extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(28, 8, 10, 8),
                 child: GestureDetector(
                   onDoubleTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProductViewScreen(game: game),
-                      ),
-                    );
+                    if (canRedirect) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductViewScreen(game: game),
+                        ),
+                      );
+                    }
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(5),

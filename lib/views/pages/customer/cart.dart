@@ -58,6 +58,13 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  bool _isLoaded(CartItem item) {
+    final p = item.product;
+    if (p == null) return false;
+    if (p.title == 'Unavailable' || p.createdAt == 'N/A') return false;
+    return true;
+  }
+
   // Future<void> loadCart() async {
   //   setState(() => _isLoading = true);
   //   try {
@@ -224,6 +231,8 @@ class _CartScreenState extends State<CartScreen> {
       if (confirm != true) return;
       setState(() => _isSaving = true);
 
+      _detector.stopListening();
+
       await CartService.syncCart(token, userId);
       if (!mounted) return;
       Navigator.push(
@@ -234,6 +243,9 @@ class _CartScreenState extends State<CartScreen> {
           },
         ),
       );
+
+      if (!mounted) return;
+      _detector.startListening();
       setState(() => _isSaving = false);
     } on TimeoutException {
       if (!mounted) return;
@@ -265,10 +277,13 @@ class _CartScreenState extends State<CartScreen> {
 
     _detector = ShakeDetector.autoStart(
       onPhoneShake: (event) async {
+        if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
         if (_isSaving || _isLoading || _cart.isEmpty) return;
+
         _detector.stopListening();
         await clearCart();
         loadCart();
+        if (mounted) _detector.startListening();
       },
       shakeThresholdGravity: 2.7,
       shakeCountResetTime: 1000,
@@ -352,12 +367,16 @@ class _CartScreenState extends State<CartScreen> {
                         itemCount: _cart.length,
                         itemBuilder: (context, index) {
                           final item = _cart[index];
+                          final loaded = _isLoaded(item);
+
+                          if (item.product!.title == "") {}
                           if (constraints.maxWidth > 800) {
                             return ItemLanscapeView(
                               amount: item.quantity,
                               game: item.product!,
                               isWishlist: false,
                               onRemove: () => remove(item),
+                              canRedirect: loaded,
                             );
                           } else {
                             return ItemPortraitView(
@@ -365,6 +384,7 @@ class _CartScreenState extends State<CartScreen> {
                               game: item.product!,
                               isWishlist: false,
                               onRemove: () => remove(item),
+                              canRedirect: loaded,
                             );
                           }
                         },

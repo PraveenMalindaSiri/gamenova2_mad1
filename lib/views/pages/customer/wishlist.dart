@@ -224,6 +224,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         onCart: () => addToCart(item),
                         onRemove: () => remove(item),
                         onUpdate: (delta) => updateWishlistAmount(item, delta),
+                        canRedirect: true,
                       );
                     } else {
                       return ItemPortraitView(
@@ -233,6 +234,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         onCart: () => addToCart(item),
                         onRemove: () => remove(item),
                         onUpdate: (delta) => updateWishlistAmount(item, delta),
+                        canRedirect: true,
                       );
                     }
                   },

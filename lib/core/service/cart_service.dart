@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:gamenova2_mad1/core/models/cart.dart';
+import 'package:gamenova2_mad1/core/models/cartItems_db.dart';
 import 'package:gamenova2_mad1/core/models/cart_db.dart';
+import 'package:gamenova2_mad1/core/service/product_service.dart';
 import 'package:gamenova2_mad1/core/utility/api_routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -16,9 +18,22 @@ class CartService {
     return _db.getCart(userId);
   }
 
-  static Future<void> addItem(int userId, int productId, int amount) {
+  // check if an item is in db, if not,  add it to db
+  static Future<void> _updateProductCache(int productId) async {
+    final cache = CartItemsDb();
+    final existing = await cache.getAnItem(productId);
+    if (existing != null) return;
+    try {
+      final p = await ProductService.getProductDetails(productId.toString());
+      await cache.saveAnItem(p);
+    } catch (_) {}
+  }
+
+  static Future<void> addItem(int userId, int productId, int amount) async {
     if (amount <= 0) amount = 1;
-    return _db.addItem(userId: userId, productId: productId, amount: amount);
+    await _db.addItem(userId: userId, productId: productId, amount: amount);
+    await _updateProductCache(productId);
+    return;
   }
 
   static Future<bool> isInUserCart(int userId, int productId) {
