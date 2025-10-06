@@ -5,6 +5,7 @@ import 'package:gamenova2_mad1/core/models/order_item.dart';
 import 'package:gamenova2_mad1/core/service/payment_service.dart';
 import 'package:gamenova2_mad1/views/pages/main_nav.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
+import 'package:vibration/vibration.dart';
 
 class OrderDetails extends StatefulWidget {
   final String token;
@@ -47,6 +48,12 @@ class _OrderDetailsState extends State<OrderDetails> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  Future<void> _vibrate() async {
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate(duration: 600);
     }
   }
 
@@ -104,6 +111,7 @@ class _OrderDetailsState extends State<OrderDetails> {
   void initState() {
     super.initState();
     getItems();
+    _vibrate();
   }
 
   @override
