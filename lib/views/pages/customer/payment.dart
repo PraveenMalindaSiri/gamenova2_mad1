@@ -1,14 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gamenova2_mad1/core/service/payment_service.dart';
 import 'package:gamenova2_mad1/views/pages/customer/orderDetails.dart';
 import 'package:gamenova2_mad1/views/widgets/dialog_helper.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart' as gc;
 
 class PaymentScreen extends StatefulWidget {
   final String token;
@@ -96,33 +95,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     final pos = await Geolocator.getCurrentPosition();
 
-    final uri = Uri.https('nominatim.openstreetmap.org', '/reverse', {
-      'lat': pos.latitude.toString(),
-      'lon': pos.longitude.toString(),
-      'format': 'json',
-      'zoom': '18',
-      'namedetails': '1',
-    });
+    try {
+      final placemarks = await gc
+          .placemarkFromCoordinates(
+            pos.latitude,
+            pos.longitude,
+            localeIdentifier: 'en_LK',
+          )
+          .timeout(const Duration(seconds: 12));
 
-    final res = await http
-        .get(
-          uri,
-          headers: {'User-Agent': 'Traveloute/1.0 (contact@example.com)'},
-        )
-        .timeout(const Duration(seconds: 12));
+      if (placemarks.isNotEmpty) {
+        final p = placemarks.first;
 
-    if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
-    final json = jsonDecode(res.body) as Map<String, dynamic>;
+        final parts = <String?>[
+          p.locality,
+          p.administrativeArea,
+          p.country,
+        ].whereType<String>().where((s) => s.trim().isNotEmpty).toList();
 
-    final namedetails = json['namedetails'] as Map<String, dynamic>?;
-    final name =
-        namedetails?['name'] as String? ??
-        (json['address']?['amenity'] as String?) ??
-        (json['display_name'] as String?);
-
-    if (name != null && name.trim().isNotEmpty) {
-      Address.text = name;
-    }
+        final line = parts.join(', ');
+        if (line.isNotEmpty) Address.text = line;
+      }
+    } catch (_) {}
   }
 
   Widget buildDate(context, double width) {
@@ -216,7 +210,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
-        
+
             // card no
             SizedBox(
               width: 400,
@@ -227,9 +221,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   if (value == null || value.isEmpty) {
                     return ("Please fill the Card No. corectly.");
                   }
-        
+
                   final cn = int.tryParse(value);
-        
+
                   if (cn == null) {
                     return ("Card No. must be a number.");
                   }
@@ -246,7 +240,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
-        
+
             LayoutBuilder(
               builder: (context, constraints) {
                 if (constraints.maxWidth > 800) {
@@ -270,7 +264,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               },
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
-        
+
             SizedBox(
               width: 400,
               child: TextFormField(
@@ -291,7 +285,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
             Padding(padding: EdgeInsets.only(bottom: 10)),
-        
+
             // button
             ElevatedButton(
               onPressed: _isSaving ? null : payment,
@@ -303,7 +297,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     )
                   : const Text(
                       'PAYMENT',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
             ),
           ],
