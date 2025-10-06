@@ -94,17 +94,13 @@ class _NetworkInfoState extends State<NetworkInfo> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: connected
-              ? Colors.green
-              : Colors.red,
-        ),
+        border: Border.all(color: connected ? Colors.green : Colors.red),
       ),
 
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(_icon, size: 10,),
+          Icon(_icon, size: 10),
           const SizedBox(width: 8),
           const Text('•', style: TextStyle(fontSize: 10)),
           const SizedBox(width: 8),

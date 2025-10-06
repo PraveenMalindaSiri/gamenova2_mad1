@@ -29,14 +29,6 @@ class _MainNavScreenState extends State<MainNavScreen> {
     _index = widget.selectPageIndex;
   }
 
-  @override
-  void didUpdateWidget(covariant MainNavScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectPageIndex != widget.selectPageIndex) {
-      _index = widget.selectPageIndex;
-    }
-  }
-
   void _navigate(int i) {
     if (_index == i) return;
     setState(() => _index = i);

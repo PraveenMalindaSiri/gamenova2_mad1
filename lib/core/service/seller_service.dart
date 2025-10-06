@@ -58,12 +58,12 @@ class SellerService {
   }) async {
     try {
       final url = Uri.https(basePath, productsPath);
-      final req = http.MultipartRequest('POST', url)
-        ..headers['Authorization'] = 'Bearer $token'
-        ..headers['Accept'] = 'application/json'
-        ..fields.addAll(
-          data.map((k, v) => MapEntry(k, v.toString())),
-        ); // transforming all data to string, string map
+      final req = http.MultipartRequest('POST', url);
+      req.headers['Authorization'] = 'Bearer $token';
+      req.headers['Accept'] = 'application/json';
+      req.fields.addAll({
+        for (final e in data.entries) e.key: e.value.toString(),
+      }); // transforming all data to string, string map
 
       if (kIsWeb) {
         final bytes = await photo.readAsBytes();
@@ -84,7 +84,7 @@ class SellerService {
         );
       }
 
-      final res = await req.send();
+      final res = await req.send().timeout(const Duration(seconds: 20));
 
       if (res.statusCode < 200 || res.statusCode >= 300) {
         final body = await res.stream.bytesToString();
